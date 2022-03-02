@@ -1,0 +1,12 @@
+set timeoutlen=500 ttimeoutlen=50
+set showcmd number ruler showmatch
+set autoindent cindent smartindent
+"set tabstop=4 shiftwidth=4 softtabstop=4 smarttab expandtab
+set wrapscan ignorecase incsearch hlsearch
+set whichwrap+=<,>,[,]
+set backspace=2 laststatus=2
+set autoread nobackup noswapfile confirm
+set linebreak
+set magic iskeyword+=_
+syntax on
+filetype plugin indent on

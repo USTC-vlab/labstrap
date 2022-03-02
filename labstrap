@@ -1,0 +1,88 @@
+#!/bin/bash
+
+BASE="$(dirname "$0")"
+SRC="$BASE/rootfs"
+DST=/target
+INPUT=/input.tar.gz
+
+run() {
+  chroot "$DST" "$@"
+}
+
+add_file() {
+  while [ "$#" -ne 0 ]; do
+    rsync -rlp "$SRC/$1" "$DST/$1"
+    shift
+  done
+}
+
+add_package() {
+  DEBIAN_FRONTEND=noninteractive run apt-get install -y --no-install-recommends "$@"
+}
+
+remove_package() {
+  DEBIAN_FRONTEND=noninteractive run apt-get purge -y --autoremove "$@"
+}
+
+if test "$(ls -1A "$DST" | wc -l)" -ne 0; then
+  echo "Target directory is not empty!" >&2
+  exit 1
+fi
+
+tar axf "$INPUT" -C "$DST"
+
+mount -t tmpfs none "$DST/dev"
+chmod 755 "$DST/dev"
+mknod -m0666 "$DST/dev/null" c 1 3
+mknod -m0666 "$DST/dev/random" c 1 8
+mknod -m0666 "$DST/dev/urandom" c 1 9
+mknod -m0666 "$DST/dev/zero" c 1 5
+ln -sf /proc/self/fd/0 "$DST/dev/stdin"
+ln -sf /proc/self/fd/1 "$DST/dev/stdout"
+ln -sf /proc/self/fd/2 "$DST/dev/stderr"
+mkdir -p "$DST/dev/pts"
+mount -t devpts none "$DST/dev/pts"
+mount -t proc proc "$DST/proc"
+mount -t tmpfs none "$DST/run"
+mount -t sysfs sys "$DST/sys"
+mount -t tmpfs none "$DST/tmp"
+
+# Preliminary cleanup
+run sh -c 'dpkg --get-selections | cut -f1 | xargs apt-mark auto'
+
+rm -f "$DST/etc/resolv.conf"
+cp -f /etc/resolv.conf "$DST/etc/resolv.conf"
+add_file /etc/apt/
+run apt-get update
+run apt-get -y dist-upgrade
+
+# Install everything
+add_package \
+  fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin fcitx-table-wubi fcitx-ui-qimpanel \
+  firefox-locale-zh-hans language-pack-zh-hans texmaker \
+  ubuntu-mate-core ubuntu-minimal xserver-xorg vlab-vnc \
+  libncurses5 \
+  bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh wget
+
+# Regional settings (time & language)
+ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
+run dpkg-reconfigure --frontend noninteractive tzdata
+add_file /etc/locale.gen
+run locale-gen
+
+# Root user
+add_file /root/
+
+# Cleanup
+remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump telnet ufw
+run apt-mark auto bash-completion cron command-not-found wget
+run apt-get clean
+rm "$DST/etc/resolv.conf"
+rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
+
+umount "$DST/dev/pts"
+umount "$DST/dev"
+umount "$DST/proc"
+umount "$DST/run"
+umount "$DST/sys"
+umount "$DST/tmp"
