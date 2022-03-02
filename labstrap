@@ -4,6 +4,7 @@ BASE="$(dirname "$0")"
 SRC="$BASE/rootfs"
 DST=/target
 INPUT=/input.tar.gz
+cd "$BASE"
 
 run() {
   chroot "$DST" "$@"
@@ -60,21 +61,32 @@ run apt-get -y dist-upgrade
 add_package \
   fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin fcitx-table-wubi fcitx-ui-qimpanel \
   firefox-locale-zh-hans language-pack-zh-hans texmaker \
-  ubuntu-mate-core ubuntu-minimal xserver-xorg vlab-vnc \
+  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg \
   libncurses5 \
-  bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh wget
+  bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
 run dpkg-reconfigure --frontend noninteractive tzdata
 add_file /etc/locale.gen
+rm -rf "$DST/var/lib/locales/supported.d"
 run locale-gen
 
 # Root user
 add_file /root/
 
+# User profile
+add_file /etc/skel
+mkdir -p "$DST"/etc/skel/.config/dconf
+XDG_CONFIG_HOME=/etc/skel/.config run dconf load / < "$BASE"/assets/user.conf
+
+# Regular user
+run adduser --disabled-password --gecos "" ubuntu
+run usermod -aG sudo ubuntu
+run passwd -d ubuntu
+
 # Cleanup
-remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump telnet ufw
+remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump telnet ufw usrmerge
 run apt-mark auto bash-completion cron command-not-found wget
 run apt-get clean
 rm "$DST/etc/resolv.conf"

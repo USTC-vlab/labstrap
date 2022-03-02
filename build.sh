@@ -6,9 +6,11 @@ if test "$#" -ne 1; then
 fi
 
 NAME=labstrap
+ROOTFS=/opt/vlab/rootfs
+
 docker build -t "$NAME" .
 docker run --rm -it --name="$NAME" --privileged \
   -v "$PWD":/srv:ro \
-  -v /opt/vlab/rootfs:/target \
+  -v "$ROOTFS":/target \
   -v "$1":/input.tar.gz:ro \
   "$NAME"
