@@ -61,11 +61,13 @@ run apt-get -y dist-upgrade
 
 # Install everything
 add_package \
-  fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin fcitx-table-wubi fcitx-ui-qimpanel \
-  firefox-locale-zh-hans language-pack-zh-hans texmaker \
-  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg \
+  fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
+  fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
+  firefox fonts-droid-fallback firefox-locale-zh-hans language-pack-zh-hans texmaker \
+  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter \
   libncurses5 \
-  bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget
+  bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
+  indicator-application indicator-session indicator-datetime indicator-notifications
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
@@ -78,7 +80,7 @@ run locale-gen
 add_file /root/
 
 # User profile (including dconf)
-add_file /etc/skel
+add_file /etc/skel/
 mkdir -p "$DST"/etc/skel/.config/dconf
 cp -r "$BASE"/assets/dconf "$DST"/tmp/dconf
 run dconf compile user /tmp/dconf
