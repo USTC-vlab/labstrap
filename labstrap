@@ -64,10 +64,11 @@ add_package \
   fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
   firefox fonts-droid-fallback firefox-locale-zh-hans language-pack-zh-hans texmaker \
-  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter \
+  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-lightdm-theme \
   libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
-  indicator-application indicator-session indicator-datetime indicator-notifications
+  indicator-application indicator-session indicator-datetime indicator-notifications \
+  ssl-cert
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
@@ -98,8 +99,11 @@ add_file /etc/ssh/
 run systemctl enable systemd-networkd
 
 # Cleanup
-remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump telnet ufw usrmerge
-run apt-mark auto bash-completion cron command-not-found wget
+remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump \
+  telnet ufw usrmerge wpasupplicant pulseaudio cups cups-browsed cups-client cups-common cups-core-drivers \
+  cups-daemon cups-filters cups-filters-core-drivers cups-ipp-utils cups-pk-helper cups-ppdc cups-server-common \
+  mysql-common gstreamer1.0-pulseaudio pulseaudio-utils wireless-tools
+run apt-mark auto bash-completion cron wget
 run apt-get clean
 rm "$DST/etc/resolv.conf"
 rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
