@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 BASE="$(dirname "$0")"
 SRC="$BASE/rootfs"
 DST=/target
@@ -75,10 +77,12 @@ run locale-gen
 # Root user
 add_file /root/
 
-# User profile
+# User profile (including dconf)
 add_file /etc/skel
 mkdir -p "$DST"/etc/skel/.config/dconf
-XDG_CONFIG_HOME=/etc/skel/.config run dconf load / < "$BASE"/assets/user.conf
+cp -r "$BASE"/assets/dconf "$DST"/tmp/dconf
+run dconf compile user /tmp/dconf
+run mv user /etc/skel/.config/dconf/user
 
 # Regular user
 run adduser --disabled-password --gecos "" ubuntu
