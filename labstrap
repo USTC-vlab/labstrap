@@ -87,6 +87,9 @@ mkdir -p "$DST"/etc/skel/.config/dconf
 mkdir -p "$DST"/etc/skel/{Desktop,Downloads,Documents}
 run dconf compile /etc/skel/.config/dconf/user /tmp/dconf/
 
+# Directory file
+add_file /usr/share/desktop-directories/
+
 # Regular user
 run adduser --disabled-password --gecos "" ubuntu
 run usermod -aG sudo ubuntu
