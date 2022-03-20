@@ -108,6 +108,8 @@ remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools
   mysql-common gstreamer1.0-pulseaudio pulseaudio-utils wireless-tools
 run apt-mark auto bash-completion cron wget
 run apt-get clean
+rm -rf "$DST/var/lib/apt/lists"/* "$DST/var/lib/dpkg"/*-old
+rm -rf "$DST/var/cache"/*
 rm "$DST/etc/resolv.conf"
 rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
 
