@@ -84,6 +84,7 @@ add_file /root/
 # User profile (including dconf)
 add_file /etc/skel/ /tmp/dconf/
 mkdir -p "$DST"/etc/skel/.config/dconf
+mkdir -p "$DST"/etc/skel/{Desktop,Downloads,Documents}
 run dconf compile /etc/skel/.config/dconf/user /tmp/dconf/
 
 # Regular user
