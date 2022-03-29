@@ -95,6 +95,10 @@ run adduser --disabled-password --gecos "" ubuntu
 run usermod -aG sudo ubuntu
 run passwd -d ubuntu
 
+# Vlab Startup
+add_file /etc/systemd/system
+run systemctl enable vlab-startup.service
+
 # Vlab SSH
 add_file /etc/ssh/
 

@@ -1,0 +1,12 @@
+[Unit]
+Description=Vlab startup task
+ConditionFileIsExecutable=/opt/vlab/bin/.startup
+
+[Service]
+Type=oneshot
+ExecStart=/opt/vlab/bin/.startup
+RemainAfterExit=true
+Restart=false
+
+[Install]
+WantedBy=multi-user.target
