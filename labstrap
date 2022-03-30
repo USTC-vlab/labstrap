@@ -102,6 +102,12 @@ run systemctl enable vlab-startup.service
 # Vlab SSH
 add_file /etc/ssh/
 
+# Vlab version info
+FILE="$DST"/etc/vlab_version
+echo "VLAB_DISTRO=ubuntu" >> "$FILE"
+echo "VLAB_VERSION=$(date +%y%m%d)" >> "$FILE"
+chmod 444 "$FILE"
+
 # Networking (for systemd-nspawn testing environment)
 run systemctl enable systemd-networkd
 
