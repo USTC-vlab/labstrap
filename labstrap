@@ -5,7 +5,7 @@ set -e
 BASE="$(dirname "$0")"
 SRC="$BASE/rootfs"
 DST=/target
-INPUT=/input.tar.gz
+INPUT=/input.tar.zst
 cd "$BASE"
 
 run() {
@@ -64,7 +64,7 @@ add_package \
   fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin \
   fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
-  firefox fonts-droid-fallback firefox-locale-zh-hans language-pack-zh-hans texmaker \
+  fonts-droid-fallback firefox-locale-zh-hans language-pack-zh-hans texmaker \
   mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
@@ -96,7 +96,7 @@ run usermod -aG sudo ubuntu
 run passwd -d ubuntu
 
 # Vlab Startup
-add_file /etc/systemd/system
+add_file /etc/systemd/system/
 run systemctl enable vlab-startup.service
 
 # Vlab SSH

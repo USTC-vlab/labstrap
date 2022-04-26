@@ -1,7 +1,7 @@
 #!/bin/sh
 
 if test "$#" -ne 1; then
-  echo "Usage: $0 <image.tar.gz>" >&2
+  echo "Usage: $0 <image.tar.zst>" >&2
   exit 1
 fi
 
@@ -12,5 +12,5 @@ docker build -t "$NAME" .
 docker run --rm -it --name="$NAME" --privileged \
   -v "$PWD":/srv:ro \
   -v "$ROOTFS":/target \
-  -v "$1":/input.tar.gz:ro \
+  -v "$1":/input.tar.zst:ro \
   "$NAME"
