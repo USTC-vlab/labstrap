@@ -65,7 +65,7 @@ add_package \
   fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
   fonts-droid-fallback firefox-locale-zh-hans language-pack-zh-hans texmaker \
-  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers \
+  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers light-themes \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   indicator-application indicator-session indicator-datetime indicator-notifications \
@@ -98,6 +98,9 @@ run passwd -d ubuntu
 # Vlab Startup
 add_file /etc/systemd/system/
 run systemctl enable vlab-startup.service
+
+# Vlab lightdm settings
+add_file /etc/lightdm/slick-greeter.conf
 
 # Vlab SSH
 add_file /etc/ssh/
