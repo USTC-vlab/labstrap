@@ -69,7 +69,8 @@ add_package \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   indicator-application indicator-session indicator-datetime indicator-notifications \
-  ssl-cert lrzsz
+  ssl-cert lrzsz \
+  gdb build-essential
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
