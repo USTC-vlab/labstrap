@@ -18,7 +18,7 @@ Run the build script in Docker, supplying the image and a rootfs directory:
 docker run --rm -it --name=labstrap --privileged \
   -v "$PWD":/srv:ro \
   -v /path/to/rootfs:/target \
-  -v /path/to/image.tar.gz:/input.tar.gz:ro \
+  -v /path/to/image.tar.zst:/input.tar.zst:ro \
   labstrap
 ```
 
@@ -36,6 +36,7 @@ Notes:
 
 - It's recommended to test container image in a VM, as the configuration of systemd-nspawn may need to change system network configuration.
 - Host and guest both need systemd-network to manage their network.
+- You MUST NOT use ["host networking"](https://wiki.archlinux.org/title/systemd-nspawn#Use_host_networking), otherwise bind() to `/tmp/.X11-unix/X0` will throw an error (if you are using X in host).
 
 Following insts are tested in Debian 11.
 
@@ -88,3 +89,36 @@ Following insts are tested in Debian 11.
     ```
 
     Then you can connect to guest with `vncviewer` on host.
+
+#### Configuring container network without systemd-networkd on host
+
+(If you just wanna run labstrap on your Linux host without a VM)
+
+Following insts are tested in Arch Linux (2022/07).
+
+1. Start container with `systemd-nspawn -D /path/to/rootfs -M vlab-ubuntu -n -U --boot --bind=/path/to/opt/vlab:/opt/vlab`
+2. Set a static IP for `ve-vlab-ubuntu` in **host**: `ip address add 192.168.233.1/24 dev ve-vlab-ubuntu`
+3. Activate `ve-vlab-ubuntu` in **host**: `ip link set ve-vlab-ubuntu up`
+4. Configure network in **container**. Add file `/etc/systemd/network/20-wired.network` with:
+
+    ```
+    [Match]
+    Name=host0
+
+    [Network]
+    Address=192.168.233.2/24
+    Gateway=192.168.233.1
+    DNS=8.8.8.8
+    ```
+
+5. Configure NAT in **host**.
+
+    ```
+    iptables -t nat -A POSTROUTING -s 192.168.233.0/24 -j MASQUERADE
+    iptables -A FORWARD -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+    iptables -A FORWARD -i ve-vlab-ubuntu -j ACCEPT
+    ```
+
+6. Disable VNC network filter in **container**: `sudo iptables -D INPUT ! -s 172.31.0.2/32 ! -i lo -p tcp -m tcp --dport 5900 -j DROP`
+
+7. Connect to container with VNC: `vncviewer 192.168.233.2`
