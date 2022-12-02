@@ -88,6 +88,9 @@ mkdir -p "$DST"/etc/skel/.config/dconf
 mkdir -p "$DST"/etc/skel/{Desktop,Downloads,Documents}
 run dconf compile /etc/skel/.config/dconf/user /tmp/dconf/
 
+# Disable dist-upgrade notification
+add_file /etc/update-manager/
+
 # Directory file
 add_file /usr/share/desktop-directories/
 
