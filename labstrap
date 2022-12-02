@@ -68,7 +68,7 @@ add_package \
   mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers light-themes \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
-  indicator-application indicator-session indicator-datetime indicator-notifications \
+  ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
   firefox-vlab ssl-cert lrzsz earlyoom libnotify-bin \
   gdb build-essential
 
