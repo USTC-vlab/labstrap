@@ -111,6 +111,8 @@ Following insts are tested in Arch Linux (2022/07).
     DNS=8.8.8.8
     ```
 
+    And restart `systemd-networkd.service`.
+
 5. Configure NAT in **host**.
 
     ```
