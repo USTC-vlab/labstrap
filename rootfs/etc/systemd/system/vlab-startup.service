@@ -6,7 +6,7 @@ ConditionFileIsExecutable=/opt/vlab/bin/.startup
 Type=oneshot
 ExecStart=/opt/vlab/bin/.startup
 RemainAfterExit=true
-Restart=false
+Restart=no
 
 [Install]
 WantedBy=multi-user.target
