@@ -124,13 +124,20 @@ add_file /etc/update-manager/release-upgrades
 run systemctl disable man-db.timer
 run systemctl disable apt-daily-upgrade.timer
 
-# Cleanup
+# Package cleanup
 remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump \
   telnet ufw usrmerge wpasupplicant pulseaudio cups cups-browsed cups-client cups-common cups-core-drivers \
   cups-daemon cups-filters cups-filters-core-drivers cups-ipp-utils cups-pk-helper cups-ppdc cups-server-common \
   mysql-common gstreamer1.0-pulseaudio pulseaudio-utils wireless-tools
 run apt-mark auto bash-completion cron wget
 run apt-get clean
+
+# Touching hicolor cache to be very old to force it rebuild on startup
+# As /opt/vlab is inaccessible when building
+# This is expected to be run after all apt operations
+touch -t 200001010101.00 "$DST/usr/share/icons/hicolor/icon-theme.cache"
+
+# Final cleanup
 rm -rf "$DST/var/lib/apt/lists"/* "$DST/var/lib/dpkg"/*-old
 rm -rf "$DST/var/cache"/*
 rm "$DST/etc/resolv.conf"
