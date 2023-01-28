@@ -64,7 +64,7 @@ add_package \
   fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin \
   fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
-  fonts-droid-fallback language-pack-zh-hans texmaker pluma file-roller \
+  fonts-droid-fallback language-pack-zh-hans language-pack-gnome-zh-hans-base texmaker pluma file-roller \
   mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers light-themes \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
