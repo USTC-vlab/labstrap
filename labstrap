@@ -69,7 +69,7 @@ add_package \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
-  firefox-vlab ssl-cert lrzsz earlyoom vlab-earlyoom libnotify-bin \
+  firefox-vlab ssl-cert lrzsz vlab-earlyoom \
   gdb build-essential
 
 # Regional settings (time & language)
