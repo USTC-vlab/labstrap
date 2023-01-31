@@ -1,0 +1,8 @@
+#!/usr/bin/env xdg-open
+[Desktop Entry]
+Version=1.0
+Type=Link
+Icon=/opt/vlab/share/regular-document.png
+Name[zh_CN]=Vlab 使用说明
+URL=/opt/vlab/share/readme.html
+Name=Vlab 使用说明
