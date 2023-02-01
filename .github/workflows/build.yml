@@ -1,0 +1,35 @@
+name: Image Build CI
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: docker build -t labstrap .
+    - name: Get Ubuntu 22.04 base image
+      run: wget http://download.proxmox.com/images/system/ubuntu-22.04-standard_22.04-1_amd64.tar.zst -O ~/ubuntu22.04.tar.zst
+    - name: Build it!
+      run: |
+        docker run --rm -i --name=labstrap --privileged \
+        -v "$PWD":/srv:ro \
+        -v $HOME/rootfs:/target \
+        -v $HOME/ubuntu22.04.tar.zst:/input.tar.zst:ro \
+        labstrap
+    - name: Pack it!
+      run: |
+        sudo tar caf output.tar.zst -C $HOME/rootfs .
+        sha256sum output.tar.zst > output.SHA256
+    - name: Upload pack to artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: labstrap-build
+        path: |
+          output.tar.zst
+          output.SHA256
