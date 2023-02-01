@@ -24,7 +24,7 @@ jobs:
         labstrap
     - name: Pack it!
       run: |
-        tar caf output.tar.zst -C $HOME/rootfs .
+        sudo tar caf output.tar.zst -C $HOME/rootfs .
         sha256sum output.tar.zst > output.SHA256
     - name: Upload pack to artifact
       uses: actions/upload-artifact@v3
