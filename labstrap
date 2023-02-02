@@ -111,9 +111,13 @@ add_file /etc/lightdm/slick-greeter.conf
 add_file /etc/ssh/
 
 # Vlab version info
+VLAB_VERSION="$(date +%y%m%d)"
+if [ -n "$GITHUB_RUN_NUMBER" ]; then
+  VLAB_VERSION="$VLAB_VERSION-gh-$GITHUB_RUN_NUMBER"
+fi
 FILE="$DST"/etc/vlab_version
-echo "VLAB_DISTRO=ubuntu" >> "$FILE"
-echo "VLAB_VERSION=$(date +%y%m%d)" >> "$FILE"
+echo "VLAB_DISTRO=ubuntu" > "$FILE"
+echo "VLAB_VERSION=$VLAB_VERSION" >> "$FILE"
 chmod 444 "$FILE"
 
 # Networking (for systemd-nspawn testing environment)

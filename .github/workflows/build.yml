@@ -23,6 +23,7 @@ jobs:
     - name: Build it!
       run: |
         docker run --rm -i --name=labstrap --privileged \
+          -e GITHUB_RUN_NUMBER \
           -v "$PWD":/srv:ro \
           -v $HOME/rootfs:/target \
           -v $HOME/input.tar.zst:/input.tar.zst:ro \
