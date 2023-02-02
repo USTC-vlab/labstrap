@@ -2,7 +2,11 @@
 
 Bootstrap VM images for Vlab
 
-## Steps
+## Pre-built images
+
+The [Auto builds](https://github.com/USTC-vlab/labstrap/releases/tag/auto-build) release holds VM images built on GitHub Actions.
+
+## Building the image locally
 
 Build Docker image:
 
@@ -25,7 +29,7 @@ docker run --rm -it --name=labstrap --privileged \
 Pack the generated image:
 
 ```shell
-sudo tar zcf output.tar.gz -C /path/to/rootfs .
+sudo tar cf output.tar.zst --zstd -C /path/to/rootfs .
 ```
 
 ## Debugging locally
