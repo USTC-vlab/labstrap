@@ -27,6 +27,7 @@ jobs:
     - name: Upload it!
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: auto-build-${{ github.run_number }}
         name: Auto build from GitHub Actions run ${{ github.run_number }}
         body_path: ${{ github.workspace }}/release-info.txt
         files: |
