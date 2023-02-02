@@ -13,7 +13,7 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build \
-          --build-arg APT_SOURCE=azure.archive.ubuntu.com \
+          --build-arg APT_SOURCE=http://azure.archive.ubuntu.com \
           -t labstrap .
     - name: Get base image
       run: |
