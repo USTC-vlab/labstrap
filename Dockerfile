@@ -6,4 +6,4 @@ RUN sed -Ei 's/(archive|security)\.ubuntu\.com/mirrors.ustc.edu.cn/g' /etc/apt/s
     apt-get -y install --no-install-recommends rsync zstd && \
     apt-get clean
 
-CMD ["/bin/bash", "/srv/labstrap"]
+CMD ["/srv/labstrap"]
