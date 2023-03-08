@@ -33,7 +33,7 @@ if test "$(ls -1A "$DST" | wc -l)" -ne 0; then
   exit 1
 fi
 
-tar axf "$INPUT" -C "$DST"
+tar axf "$INPUT" -C "$DST" $TAR_FLAGS
 
 mount_all() {
   mount -t tmpfs none "$DST/dev"

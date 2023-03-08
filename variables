@@ -1,4 +1,4 @@
 #!/bin/sh
 
 # PVE/Storage/Plugin.pm: our @COMMON_TAR_FLAGS
-TAR_FLAGS="--one-file-system -p --sparse --numeric-owner --acls --xattts --xattrs-include=*"
+TAR_FLAGS="--one-file-system -p --sparse --numeric-owner --acls --xattrs --xattrs-include=*"
