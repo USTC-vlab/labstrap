@@ -33,7 +33,8 @@ jobs:
           labstrap
     - name: Pack it!
       run: |
-        sudo tar caf ${{ env.filename }}.tar.zst -C $HOME/rootfs .
+        . ./variables
+        sudo tar caf ${{ env.filename }}.tar.zst -C $HOME/rootfs $TAR_FLAGS .
         sha256sum ${{ env.filename }}.tar.zst > ${{ env.filename }}-sha256.txt
     - name: Upload it!
       uses: softprops/action-gh-release@v1

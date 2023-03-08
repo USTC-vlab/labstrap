@@ -7,6 +7,7 @@ SRC="$BASE/rootfs"
 DST=/target
 INPUT=/input.tar.zst
 cd "$BASE"
+. ./variables
 
 run() {
   chroot "$DST" "$@"
@@ -159,6 +160,9 @@ run sed -i "s,%APT_SOURCE%,https://mirrors.ustc.edu.cn,g" /etc/apt/sources.list
 # As /opt/vlab is inaccessible when building
 # This is expected to be run after all apt operations
 touch -t 200001010101.00 "$DST/usr/share/icons/hicolor/icon-theme.cache"
+
+# Fix ping capabilities
+setcap cap_net_raw=ep "$DST/usr/bin/ping"
 
 # Final cleanup
 set +e
