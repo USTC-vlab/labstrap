@@ -125,6 +125,9 @@ add_file /etc/lightdm/slick-greeter.conf
 # Vlab SSH
 add_file /etc/ssh/
 
+# Vlab profile ($PATH)
+add_file /etc/profile.d/vlab.sh
+
 # Vlab version info
 VLAB_VERSION="$(date +%y%m%d)"
 if [ -n "$GITHUB_RUN_NUMBER" ]; then
