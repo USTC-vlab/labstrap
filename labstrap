@@ -86,7 +86,10 @@ add_package \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
   firefox-vlab ssl-cert lrzsz vlab-earlyoom zenity \
-  gdb build-essential
+  gdb build-essential \
+  git man llvm-11 llvm-11-dev \
+  libreadline-dev libsdl2-dev \
+  gtkwave
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
