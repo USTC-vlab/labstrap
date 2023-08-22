@@ -87,9 +87,7 @@ add_package \
   ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
   firefox-vlab ssl-cert lrzsz vlab-earlyoom zenity \
   gdb build-essential \
-  git man llvm-11 llvm-11-dev \
-  libreadline-dev libsdl2-dev \
-  gtkwave
+  git man llvm-11 llvm-11-dev libsdl2-dev libreadline-dev gtkwave
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
