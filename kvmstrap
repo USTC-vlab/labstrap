@@ -17,4 +17,4 @@ trap 'fusermount -u "$DST"' EXIT
 rsync -rlpt "$SRC"/etc/{apt,cloud,default,locale.gen,profile.d,skel,ssh,systemd} "$DST"/etc/
 
 # Simulate systemctl enable
-ln -s /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
+ln -sfn /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
