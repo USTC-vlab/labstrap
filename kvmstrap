@@ -9,6 +9,7 @@ INPUT="${1:-input.qcow2}"
 cd "$BASE"
 . ./variables
 
+qemu-img resize "$INPUT" 4096M
 mkdir -p "$DST"
 guestmount -a "$INPUT" -m /dev/sda1 "$DST"
 trap 'fusermount -u "$DST"' EXIT
