@@ -4,24 +4,16 @@ set -e
 
 BASE="$(dirname "$0")"
 SRC="$BASE/rootfs"
-DST=/target
+DST=/tmp/target
 INPUT="${1:-input.qcow2}"
 cd "$BASE"
 . ./variables
 
-guestfish -a "$INPUT" --rw << EOF
-run
-lcd "$SRC"
-mount /dev/sda1 /
-copy-in etc/apt /etc
-copy-in etc/cloud /etc
-copy-in etc/default /etc
-copy-in etc/locale.gen /etc
-copy-in etc/profile.d /etc
-copy-in etc/skel /etc
-copy-in etc/ssh /etc
-copy-in etc/systemd /etc
+mkdir -p "$DST"
+guestmount -a "$INPUT" -m /dev/sda1 "$DST"
+trap 'fusermount -u "$DST"' EXIT
+
+rsync -rlpt "$SRC"/etc/{apt,cloud,default,locale.gen,profile.d,skel,ssh,systemd} "$DST"/etc/
 
 # Simulate systemctl enable
-ln-s /etc/systemd/system/vlab-startup.service /etc/systemd/system/multi-user.target.wants/vlab-startup.service
-EOF
+ln -s /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
