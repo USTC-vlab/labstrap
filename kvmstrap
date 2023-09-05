@@ -1,0 +1,32 @@
+#!/bin/bash
+
+set -e
+
+BASE="$(dirname "$0")"
+SRC="$BASE/rootfs"
+DST=/target
+INPUT="${1:-input.qcow2}"
+cd "$BASE"
+. ./variables
+
+# Prepare files
+SOURCES_LIST=/tmp/sources.list
+cp "$SRC/etc/apt/sources.list" "$SOURCES_LIST"
+sed -Ei 's|%APT_SOURCE%|http://mirrors.ustc.edu.cn|g' "$SOURCES_LIST"
+
+guestfish -a "$INPUT" --rw << EOF
+run
+lcd "$SRC"
+mount /dev/sda1 /
+copy-in etc/apt /etc
+copy-in "$SOURCES_LIST" /etc/apt
+copy-in etc/default /etc
+copy-in etc/locale.gen /etc
+copy-in etc/profile.d /etc
+copy-in etc/skel /etc
+copy-in etc/ssh /etc
+copy-in etc/systemd /etc
+
+# Simulate systemctl enable
+ln-s /etc/systemd/system/vlab-startup.service /etc/systemd/system/multi-user.target.wants/vlab-startup.service
+EOF
