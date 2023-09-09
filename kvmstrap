@@ -14,7 +14,14 @@ mkdir -p "$DST"
 guestmount -a "$INPUT" -m /dev/sda1 "$DST"
 trap 'fusermount -u "$DST"' EXIT
 
+# Add files
 rsync -rlpt "$SRC"/etc/{apt,cloud,default,locale.gen,profile.d,skel,ssh,systemd} "$DST"/etc/
+
+# Remove "pass" from fstab
+sed -Ei 's/\b[0-9]+$/0/g' "$DST"/etc/fstab
+
+# Remove root password
+sed -Ei 's/^(root:)[^:]*(:.*$)/\1\2/' "$DST"/etc/shadow
 
 # Simulate systemctl enable
 ln -sfn /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
