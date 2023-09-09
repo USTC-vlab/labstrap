@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Version info
+# TODO: Manually increase this number after any substantial changes
+VERSION=1
+
 set -e
 
 BASE="$(dirname "$0")"
@@ -25,3 +29,13 @@ sed -Ei 's/^(root:)[^:]*(:.*$)/\1\2/' "$DST"/etc/shadow
 
 # Simulate systemctl enable
 ln -sfn /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
+
+# Write version info
+VLAB_VERSION="$VERSION:$(date +%y%m%d)"
+if [ -n "$GITHUB_RUN_NUMBER" ]; then
+  VLAB_VERSION="$VLAB_VERSION-gh-$GITHUB_RUN_NUMBER"
+fi
+FILE="$DST"/etc/vlab_version
+echo "VLAB_DISTRO=ubuntu" > "$FILE"
+echo "VLAB_VERSION=$VLAB_VERSION" >> "$FILE"
+chmod 444 "$FILE"
