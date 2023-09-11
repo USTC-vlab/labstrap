@@ -1,0 +1,62 @@
+#!/bin/sh
+
+# Basic sanity check
+if [ ! -d /etc/pve ]; then
+  echo "This script should only be run inside Proxmox VE" >&2
+  exit 1
+fi
+
+# For LXC: subuid and subgid
+echo "root:100000:165536" > /etc/subuid
+echo "root:100000:165536" > /etc/subgid
+
+# sysctl
+rm -f \
+  /etc/sysctl.d/10-arp.conf \
+  /etc/sysctl.d/20-inotify.conf \
+  /etc/sysctl.d/20-keys.conf \
+  /etc/sysctl.d/20-nf-conntrack.conf \
+  /etc/sysctl.d/20-pids.conf \
+  /etc/sysctl.d/30-net.conf
+
+cat > /etc/sysctl.d/10-vlab.conf << EOF
+# ARP
+net.ipv4.conf.all.arp_ignore = 1
+net.ipv4.conf.all.arp_announce = 2
+
+# inotify (for VSCode and various)
+fs.inotify.max_user_instances = 65536
+
+# keyctl (for Docker)
+kernel.keys.maxkeys = 50000
+kernel.keys.maxbytes = 1000000
+
+# conntrack
+net.nf_conntrack_max = 1048576
+
+# PIDs
+kernel.pid_max = 4194304
+
+# Miscellaneous networking
+net.core.default_qdisc = fq
+net.ipv4.tcp_congestion_control = bbr
+EOF
+
+# LXC conf
+rm -f \
+  /usr/share/lxc/config/common.conf.d/10-pids.conf \
+  /usr/share/lxc/config/common.conf.d/10-prlimits.conf
+
+PIDS_MAX=32768
+if [ "$(hostname -s)" = "pv1" ]; then
+  PIDS_MAX=8192
+fi
+
+cat > /usr/share/lxc/config/common.conf.d/10-vlab.conf << EOF
+lxc.cgroup2.pids.max = $PIDS_MAX
+lxc.prlimit.memlock = 16777216
+
+# TUN device and KVM device
+lxc.cgroup2.devices.allow: c 10:200 rwm
+lxc.cgroup2.devices.allow: c 10:232 rwm
+EOF
