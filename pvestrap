@@ -65,6 +65,6 @@ lxc.cgroup2.pids.max = $PIDS_MAX
 lxc.prlimit.memlock = 16777216
 
 # TUN device and KVM device
-lxc.cgroup2.devices.allow: c 10:200 rwm
-lxc.cgroup2.devices.allow: c 10:232 rwm
+lxc.cgroup2.devices.allow = c 10:200 rwm
+lxc.cgroup2.devices.allow = c 10:232 rwm
 EOF
