@@ -68,3 +68,11 @@ lxc.prlimit.memlock = 16777216
 lxc.cgroup2.devices.allow = c 10:200 rwm
 lxc.cgroup2.devices.allow = c 10:232 rwm
 EOF
+
+
+# LVM conf
+F=/etc/lvm/lvm.conf
+if ! grep -qP '^\s*issue_discards\s*=\s*1' "$F"; then
+  printf "devices {\n\tissue_discards = 1\n}\n" >> "$F"
+  update-initramfs -u -k all
+fi
