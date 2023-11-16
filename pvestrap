@@ -15,6 +15,21 @@ echo "root:100000:165536" > /etc/subuid
 echo "root:100000:165536" > /etc/subgid
 
 
+# apt and dpkg
+cat > /etc/apt/sources.list << EOF
+deb https://mirrors.ustc.edu.cn/debian bookworm main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian bookworm-updates main contrib non-free non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+EOF
+
+# influxdata source (for telegraf)
+if [ ! -f /etc/apt/keyrings/influxdata.asc ]; then
+  mkdir -p /etc/apt/keyrings
+  wget https://mirrors.ustc.edu.cn/influxdata/influxdata-archive_compat.key -O /etc/apt/keyrings/influxdata.asc
+fi
+echo 'deb [signed-by=/etc/apt/keyrings/influxdata.asc] https://mirrors.ustc.edu.cn/influxdata/debian stable main' > /etc/apt/sources.list.d/influxdata.list
+
+
 # sysctl
 rm -f \
   /etc/sysctl.d/10-arp.conf \
@@ -76,3 +91,17 @@ if ! grep -qP '^\s*issue_discards\s*=\s*1' "$F"; then
   printf "devices {\n\tissue_discards = 1\n}\n" >> "$F"
   update-initramfs -u -k all
 fi
+
+
+# iptables
+rm -f /etc/iptables/ipsets
+cat << EOF | tee /etc/iptables/rules.v{4,6} >/dev/null
+*nat
+:PREROUTING ACCEPT [0:0]
+:INPUT ACCEPT [0:0]
+:OUTPUT ACCEPT [0:0]
+:POSTROUTING ACCEPT [0:0]
+-A PREROUTING -m addrtype --dst-type LOCAL -p tcp --dport 443 -j REDIRECT --to-ports 8006
+COMMIT
+EOF
+
