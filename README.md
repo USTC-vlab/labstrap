@@ -86,14 +86,6 @@ Following insts are tested in Debian 11.
     # systemd-nspawn -D /path/to/rootfs -M ubuntu -n --boot --resolv-conf=copy-host -p 5900:5900 --bind=/path/to/opt/vlab:/opt/vlab
     ```
 
-5. Clear iptables settings in **guest** (to test VNC)
-
-    ```console
-    $ sudo iptables -D INPUT ! -s 172.31.0.2/32 ! -i lo -p tcp -m tcp --dport 5900 -j DROP
-    ```
-
-    Then you can connect to guest with `vncviewer` on host.
-
 #### Configuring container network without systemd-networkd on host
 
 (If you just wanna run labstrap on your Linux host without a VM)
@@ -125,6 +117,4 @@ Following insts are tested in Arch Linux (2022/07).
     iptables -A FORWARD -i ve-vlab-ubuntu -j ACCEPT
     ```
 
-6. Disable VNC network filter in **container**: `sudo iptables -D INPUT ! -s 172.31.0.2/32 ! -i lo -p tcp -m tcp --dport 5900 -j DROP`
-
-7. Connect to container with VNC: `vncviewer 192.168.233.2`
+6. Connect to container with VNC: `vncviewer 192.168.233.2`
