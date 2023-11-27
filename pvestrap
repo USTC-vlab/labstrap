@@ -87,8 +87,19 @@ EOF
 
 # LVM conf
 F=/etc/lvm/lvm.conf
+if [ ! -f "$F.dpkg-divert" ]; then
+  dpkg-divert --rename --divert "$F.dpkg-divert" --add "$F"
+fi
+
 if ! grep -qP '^\s*issue_discards\s*=\s*1' "$F"; then
-  printf "devices {\n\tissue_discards = 1\n}\n" >> "$F"
+  cat > "$F" << EOF
+devices {
+  # added by pve-manager to avoid scanning ZFS zvols
+  global_filter=["r|/dev/zd.*|"]
+  scan_lvs=0
+  issue_discards = 1
+}
+EOF
   update-initramfs -u -k all
 fi
 
