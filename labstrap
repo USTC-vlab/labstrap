@@ -79,7 +79,7 @@ run apt-get -y dist-upgrade
 add_package \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   iproute2 less libc-l10n locales logrotate lsof man-db nano netcat-traditional tasksel traceroute \
-  ssl-cert lrzsz vlab-earlyoom iputils-ping \
+  ssl-cert lrzsz vlab-earlyoom iputils-ping ifupdown \
   gdb build-essential
 
 # Regional settings (time & language)
@@ -122,8 +122,8 @@ echo "VLAB_DISTRO=debian" > "$FILE"
 echo "VLAB_VERSION=$VLAB_VERSION" >> "$FILE"
 chmod 444 "$FILE"
 
-# Networking (for systemd-nspawn testing environment)
-run systemctl enable systemd-networkd
+# Mask sys-kernel-config.mount
+run systemctl mask sys-kernel-config.mount
 
 # Prevent containers from thrusting I/O
 run systemctl disable man-db.timer
