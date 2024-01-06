@@ -7,6 +7,7 @@ SRC="$BASE/rootfs"
 DST=/target
 INPUT=/input.tar.gz
 cd "$BASE"
+. ./variables
 
 run() {
   chroot "$DST" "$@"
@@ -32,23 +33,37 @@ if test "$(ls -1A "$DST" | wc -l)" -ne 0; then
   exit 1
 fi
 
-tar axf "$INPUT" -C "$DST"
+tar axf "$INPUT" -C "$DST" $TAR_FLAGS
 
-mount -t tmpfs none "$DST/dev"
-chmod 755 "$DST/dev"
-mknod -m0666 "$DST/dev/null" c 1 3
-mknod -m0666 "$DST/dev/random" c 1 8
-mknod -m0666 "$DST/dev/urandom" c 1 9
-mknod -m0666 "$DST/dev/zero" c 1 5
-ln -sf /proc/self/fd/0 "$DST/dev/stdin"
-ln -sf /proc/self/fd/1 "$DST/dev/stdout"
-ln -sf /proc/self/fd/2 "$DST/dev/stderr"
-mkdir -p "$DST/dev/pts"
-mount -t devpts none "$DST/dev/pts"
-mount -t proc proc "$DST/proc"
-mount -t tmpfs none "$DST/run"
-mount -t sysfs sys "$DST/sys"
-mount -t tmpfs none "$DST/tmp"
+mount_all() {
+  mount -t tmpfs none "$DST/dev"
+  chmod 755 "$DST/dev"
+  mknod -m0666 "$DST/dev/null" c 1 3
+  mknod -m0666 "$DST/dev/random" c 1 8
+  mknod -m0666 "$DST/dev/urandom" c 1 9
+  mknod -m0666 "$DST/dev/zero" c 1 5
+  ln -sf /proc/self/fd/0 "$DST/dev/stdin"
+  ln -sf /proc/self/fd/1 "$DST/dev/stdout"
+  ln -sf /proc/self/fd/2 "$DST/dev/stderr"
+  mkdir -p "$DST/dev/pts"
+  mount -t devpts none "$DST/dev/pts"
+  mount -t proc proc "$DST/proc"
+  mount -t tmpfs none "$DST/run"
+  mount -t sysfs sys "$DST/sys"
+  mount -t tmpfs none "$DST/tmp"
+}
+
+umount_all() {
+  umount "$DST/dev/pts"
+  umount "$DST/dev"
+  umount "$DST/proc"
+  umount "$DST/run"
+  umount "$DST/sys"
+  umount "$DST/tmp"
+}
+
+mount_all
+trap umount_all EXIT
 
 # Preliminary cleanup
 run sh -c 'dpkg --get-selections | cut -f1 | xargs apt-mark auto'
@@ -65,11 +80,12 @@ add_package \
   fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
   firefox fonts-droid-fallback firefox-locale-zh-hans language-pack-zh-hans texmaker \
-  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers \
+  mate-tweak ubuntu-mate-core ubuntu-minimal xserver-xorg slick-greeter ubuntu-mate-wallpapers \
   caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   indicator-application indicator-session indicator-datetime indicator-notifications \
-  ssl-cert lrzsz
+  ssl-cert lrzsz \
+  vlab-vnc vlab-earlyoom
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
@@ -106,13 +122,24 @@ run systemctl enable vlab-startup.service
 add_file /etc/ssh/
 
 # Vlab version info
+VLAB_VERSION="$(date +%y%m%d)"
+if [ -n "$GITHUB_RUN_NUMBER" ]; then
+  VLAB_VERSION="$VLAB_VERSION-gh-$GITHUB_RUN_NUMBER"
+fi
 FILE="$DST"/etc/vlab_version
-echo "VLAB_DISTRO=ubuntu" >> "$FILE"
-echo "VLAB_VERSION=$(date +%y%m%d)" >> "$FILE"
+echo "VLAB_DISTRO=ubuntu" > "$FILE"
+echo "VLAB_VERSION=$VLAB_VERSION" >> "$FILE"
 chmod 444 "$FILE"
 
 # Networking (for systemd-nspawn testing environment)
 run systemctl enable systemd-networkd
+
+# Prevent containers from thrusting I/O
+run systemctl disable man-db.timer
+run systemctl disable apt-daily-upgrade.timer
+
+# Fix ping capabilities
+setcap cap_net_raw=ep "$DST/usr/bin/ping"
 
 # Cleanup
 remove_package -o 'APT::AutoRemove::SuggestsImportant=false' apparmor dosfstools ed postfix strace tcpdump \
@@ -125,10 +152,3 @@ rm -rf "$DST/var/lib/apt/lists"/* "$DST/var/lib/dpkg"/*-old
 rm -rf "$DST/var/cache"/*
 rm "$DST/etc/resolv.conf"
 rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
-
-umount "$DST/dev/pts"
-umount "$DST/dev"
-umount "$DST/proc"
-umount "$DST/run"
-umount "$DST/sys"
-umount "$DST/tmp"

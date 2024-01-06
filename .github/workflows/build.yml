@@ -1,0 +1,45 @@
+name: Image Build CI
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      filename: build-${{ github.run_number }}
+    steps:
+    - uses: actions/checkout@v3
+    - name: Build the Docker image
+      run: |
+        docker build \
+          --build-arg APT_SOURCE=http://azure.archive.ubuntu.com \
+          -t labstrap .
+    - name: Get base image
+      run: |
+        wget --progress=dot:giga \
+          -O ~/input.tar.gz \
+          http://download.proxmox.com/images/system/ubuntu-20.04-standard_20.04-1_amd64.tar.gz
+    - name: Build it!
+      run: |
+        docker run --rm -i --name=labstrap --privileged \
+          -e GITHUB_RUN_NUMBER \
+          -v "$PWD":/srv:ro \
+          -v $HOME/rootfs:/target \
+          -v $HOME/input.tar.gz:/input.tar.gz:ro \
+          labstrap
+    - name: Pack it!
+      run: |
+        . ./variables
+        sudo tar caf ${{ env.filename }}.tar.zst -C $HOME/rootfs $TAR_FLAGS .
+        sha256sum ${{ env.filename }}.tar.zst > ${{ env.filename }}-sha256.txt
+    - name: Upload it!
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: auto-build-ubuntu2004
+        files: |
+          ${{ env.filename }}.tar.zst
+          ${{ env.filename }}-sha256.txt
