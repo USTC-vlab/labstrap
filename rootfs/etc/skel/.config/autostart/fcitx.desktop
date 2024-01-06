@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Exec=/usr/bin/fcitx -d
-Hidden=false
-Name[zh_CN]=Fcitx
-Name=Fcitx
-Comment[zh_CN]=
-Comment=
-X-MATE-Autostart-Delay=0

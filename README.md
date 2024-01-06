@@ -1,17 +1,17 @@
-# labstrap
+# labstrap (Debian 12)
 
 Bootstrap VM images for Vlab
 
 ## Pre-built images
 
-The [Auto builds](https://github.com/USTC-vlab/labstrap/releases/tag/auto-build) release holds VM images built on GitHub Actions.
+The [Auto builds](https://github.com/USTC-vlab/labstrap/releases/tag/auto-build-debian12) release holds VM images built on GitHub Actions.
 
 ## Building the image locally
 
 Build Docker image:
 
 ```shell
-docker build -t labstrap .
+docker build -t labstrap:debian12 .
 ```
 
 Grab a base image from <http://download.proxmox.com/images/system/> or a mirror site at your option.
@@ -23,7 +23,7 @@ docker run --rm -it --name=labstrap --privileged \
   -v "$PWD":/srv:ro \
   -v /path/to/rootfs:/target \
   -v /path/to/image.tar.zst:/input.tar.zst:ro \
-  labstrap
+  labstrap:debian12
 ```
 
 Pack the generated image:

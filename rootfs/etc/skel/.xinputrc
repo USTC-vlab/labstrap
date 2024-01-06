@@ -1,4 +1,0 @@
-# im-config in Ubuntu 22.04 does not work well with fcitx & D-Bus
-# thus we choose to do it ourselves
-
-run_im none

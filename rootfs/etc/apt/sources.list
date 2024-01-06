@@ -1,7 +1,7 @@
 # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb %APT_SOURCE%/ubuntu/ jammy main restricted universe multiverse
-#deb-src %APT_SOURCE%/ubuntu/ jammy main restricted universe multiverse
-deb %APT_SOURCE%/ubuntu/ jammy-updates main restricted universe multiverse
-#deb-src %APT_SOURCE%/ubuntu/ jammy-updates main restricted universe multiverse
-deb %APT_SOURCE%/ubuntu/ jammy-security main restricted universe multiverse
-#deb-src %APT_SOURCE%/ubuntu/ jammy-security main restricted universe multiverse
+deb %APT_SOURCE%/debian/ bookworm main contrib non-free non-free-firmware
+#deb-src %APT_SOURCE%/debian/ bookworm main contrib non-free non-free-firmware
+deb %APT_SOURCE%/debian/ bookworm-updates main contrib non-free non-free-firmware
+#deb-src %APT_SOURCE%/debian/ bookworm-updates main contrib non-free non-free-firmware
+deb %APT_SOURCE%/debian/ bookworm-security main contrib non-free non-free-firmware
+#deb-src %APT_SOURCE%/debian/ bookworm-security main contrib non-free non-free-firmware

@@ -77,15 +77,8 @@ run apt-get -y dist-upgrade
 
 # Install everything
 add_package \
-  fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin \
-  fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
-  fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
-  fonts-droid-fallback language-pack-zh-hans language-pack-gnome-zh-hans-base texmaker pluma file-roller eom atril \
-  mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers light-themes \
-  caja-open-terminal libncurses5 \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
-  ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
-  firefox-vlab ssl-cert lrzsz vlab-earlyoom \
+  ssl-cert lrzsz vlab-earlyoom \
   gdb build-essential
 
 # Regional settings (time & language)
@@ -99,28 +92,18 @@ run locale-gen
 add_file /root/
 
 # User profile (including dconf)
-add_file /etc/skel/ /tmp/dconf/
+add_file /etc/skel/
 mkdir -p "$DST"/etc/skel/.config/dconf
 mkdir -p "$DST"/etc/skel/{Desktop,Downloads,Documents}
-run dconf compile /etc/skel/.config/dconf/user /tmp/dconf/
-
-# Disable dist-upgrade notification
-add_file /etc/update-manager/
-
-# Directory file
-add_file /usr/share/desktop-directories/
 
 # Regular user
-run adduser --disabled-password --gecos "" ubuntu
-run usermod -aG sudo ubuntu
-run passwd -d ubuntu
+run adduser --disabled-password --gecos "" vlab
+run usermod -aG sudo vlab
+run passwd -d vlab
 
 # Vlab Startup & systemd overrides
 add_file /etc/systemd/system/
 run systemctl enable vlab-startup.service
-
-# Vlab lightdm settings
-add_file /etc/lightdm/slick-greeter.conf
 
 # Vlab SSH
 add_file /etc/ssh/
@@ -134,15 +117,13 @@ if [ -n "$GITHUB_RUN_NUMBER" ]; then
   VLAB_VERSION="$VLAB_VERSION-gh-$GITHUB_RUN_NUMBER"
 fi
 FILE="$DST"/etc/vlab_version
-echo "VLAB_DISTRO=ubuntu" > "$FILE"
+echo "VLAB_DISTRO=debian" > "$FILE"
 echo "VLAB_VERSION=$VLAB_VERSION" >> "$FILE"
 chmod 444 "$FILE"
 
 # Networking (for systemd-nspawn testing environment)
 run systemctl enable systemd-networkd
 
-# Set misc settings
-add_file /etc/update-manager/release-upgrades
 # Prevent containers from thrusting I/O
 run systemctl disable man-db.timer
 run systemctl disable apt-daily-upgrade.timer
@@ -158,11 +139,6 @@ run apt-get clean
 # Set the apt source of the resulting image to USTC mirrors
 add_file /etc/apt/sources.list
 run sed -i "s,%APT_SOURCE%,https://mirrors.ustc.edu.cn,g" /etc/apt/sources.list
-
-# Touching hicolor cache to be very old to force it rebuild on startup
-# As /opt/vlab is inaccessible when building
-# This is expected to be run after all apt operations
-touch -t 200001010101.00 "$DST/usr/share/icons/hicolor/icon-theme.cache"
 
 # Fix ping capabilities
 setcap cap_net_raw=ep "$DST/usr/bin/ping"
