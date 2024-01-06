@@ -40,6 +40,7 @@ jobs:
       uses: softprops/action-gh-release@v1
       with:
         tag_name: auto-build-ubuntu2004
+        target_commitish: ubuntu2004
         files: |
           ${{ env.filename }}.tar.zst
           ${{ env.filename }}-sha256.txt
