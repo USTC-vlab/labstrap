@@ -85,7 +85,7 @@ add_package \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   indicator-application indicator-session indicator-datetime indicator-notifications \
   ssl-cert lrzsz \
-  vlab-vnc vlab-earlyoom
+  vlab-vnc vlab-earlyoom zenity
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
