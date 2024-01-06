@@ -3,5 +3,5 @@ deb %APT_SOURCE%/debian/ bookworm main contrib non-free non-free-firmware
 #deb-src %APT_SOURCE%/debian/ bookworm main contrib non-free non-free-firmware
 deb %APT_SOURCE%/debian/ bookworm-updates main contrib non-free non-free-firmware
 #deb-src %APT_SOURCE%/debian/ bookworm-updates main contrib non-free non-free-firmware
-deb %APT_SOURCE%/debian/ bookworm-security main contrib non-free non-free-firmware
-#deb-src %APT_SOURCE%/debian/ bookworm-security main contrib non-free non-free-firmware
+deb %APT_SOURCE%/debian-security/ bookworm-security main contrib non-free non-free-firmware
+#deb-src %APT_SOURCE%/debian-security/ bookworm-security main contrib non-free non-free-firmware

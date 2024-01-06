@@ -78,7 +78,7 @@ run apt-get -y dist-upgrade
 # Install everything
 add_package \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
-  ssl-cert lrzsz vlab-earlyoom \
+  ssl-cert lrzsz vlab-earlyoom iputils-ping \
   gdb build-essential
 
 # Regional settings (time & language)
