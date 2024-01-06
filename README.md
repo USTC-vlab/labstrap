@@ -7,7 +7,7 @@ Bootstrap VM images for Vlab
 Build Docker image:
 
 ```shell
-docker build -t labstrap .
+docker build -t labstrap:ubuntu2004 .
 ```
 
 Grab a base image from <http://download.proxmox.com/images/system/> or a mirror site at your option.
@@ -19,7 +19,7 @@ docker run --rm -it --name=labstrap --privileged \
   -v "$PWD":/srv:ro \
   -v /path/to/rootfs:/target \
   -v /path/to/image.tar.gz:/input.tar.gz:ro \
-  labstrap
+  labstrap:ubuntu2004
 ```
 
 Pack the generated image:

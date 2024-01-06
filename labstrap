@@ -115,7 +115,7 @@ run usermod -aG sudo ubuntu
 run passwd -d ubuntu
 
 # Vlab Startup
-add_file /etc/systemd/system
+add_file /etc/systemd/system/
 run systemctl enable vlab-startup.service
 
 # Vlab SSH
