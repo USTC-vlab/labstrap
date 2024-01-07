@@ -61,6 +61,8 @@ kernel.pid_max = 4194304
 net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 net.ipv4.ip_forward = 1
+net.ipv4.neigh.default.gc_thresh3 = 8192
+net.ipv6.neigh.default.gc_thresh3 = 8192
 EOF
 sysctl --system
 
