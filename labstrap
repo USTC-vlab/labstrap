@@ -114,8 +114,13 @@ run adduser --disabled-password --gecos "" ubuntu
 run usermod -aG sudo ubuntu
 run passwd -d ubuntu
 
+# Systemd-journald
+run dpkg-divert --rename --divert /etc/systemd/journald.conf.dpkg-divert --add /etc/systemd/journald.conf
+run mkdir -p /var/log/journal
+run chown root:systemd-journal /var/log/journal
+
 # Vlab Startup
-add_file /etc/systemd/system/
+add_file /etc/systemd/
 run systemctl enable vlab-startup.service
 
 # Vlab SSH
