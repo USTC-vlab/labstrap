@@ -1,0 +1,25 @@
+#!/bin/bash
+
+set -e
+
+if test $# -ne 1; then
+  echo "Usage: $0 FILE" >&2
+  exit 1
+fi
+
+FILE="$1"
+
+cat << EOF
+labstrap build info:
+
+Environment:
+CI=${CI:-(none)}
+GITHUB_RUN_NUMBER=${GITHUB_RUN_NUMBER:-(none)}
+
+Git info:
+EOF
+
+git log -1
+
+echo
+echo "SHA256: $(sha256sum "$FILE")"
