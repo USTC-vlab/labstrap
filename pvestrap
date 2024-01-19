@@ -22,6 +22,14 @@ deb https://mirrors.ustc.edu.cn/debian bookworm-updates main contrib non-free no
 deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
 EOF
 
+cat > /etc/apt/apt.conf.d/51unattended-upgrades-custom << EOF
+Unattended-Upgrade::Origins-Pattern {
+    "origin=Debian,codename=\${distro_codename}-updates,label=Debian";
+    "origin=Proxmox,codename=\${distro_codename}";
+    "origin=InfluxDB";
+};
+EOF
+
 # influxdata source (for telegraf)
 if [ ! -f /etc/apt/keyrings/influxdata.asc ]; then
   mkdir -p /etc/apt/keyrings
@@ -97,7 +105,7 @@ if ! grep -qP '^\s*issue_discards\s*=\s*1' "$F"; then
   cat > "$F" << EOF
 devices {
   # added by pve-manager to avoid scanning ZFS zvols
-  global_filter=["r|/dev/zd.*|"]
+  global_filter=["r|/dev/zd.*|","r|/dev/rbd.*|"]
   scan_lvs=0
   issue_discards = 1
 }
