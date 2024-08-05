@@ -92,6 +92,10 @@ lxc.prlimit.memlock = 16777216
 # TUN device and KVM device
 lxc.cgroup2.devices.allow = c 10:200 rwm
 lxc.cgroup2.devices.allow = c 10:232 rwm
+
+# Limit tmpfs size
+lxc.mount.entry = tmpfs run tmpfs size=2G,mode=0755 0 0
+lxc.mount.entry = tmpfs dev/shm tmpfs size=4G,mode=1777,create=dir 0 0
 EOF
 
 
