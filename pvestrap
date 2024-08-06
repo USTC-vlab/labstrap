@@ -36,6 +36,8 @@ if [ ! -f /etc/apt/keyrings/influxdata.asc ]; then
   wget https://mirrors.ustc.edu.cn/influxdata/influxdata-archive_compat.key -O /etc/apt/keyrings/influxdata.asc
 fi
 echo 'deb [signed-by=/etc/apt/keyrings/influxdata.asc] https://mirrors.ustc.edu.cn/influxdata/debian stable main' > /etc/apt/sources.list.d/influxdata.list
+# remove old influxdata list, if exists
+rm -f /etc/apt/sources.list.d/influxdb.list
 
 
 # sysctl
