@@ -3,7 +3,7 @@
 <wallpapers>
   <wallpaper deleted="false">
     <name>USTC Vlab</name>
-    <filename>/opt/vlab/share/background.png</filename>
+    <filename>/opt/vlab/share/background-24.04.jpg</filename>
     <options>zoom</options>
     <shade_type>vertical-gradient</shade_type>
     <pcolor>rgb(88,145,188)</pcolor>

@@ -71,7 +71,8 @@ run sh -c 'dpkg --get-selections | cut -f1 | xargs apt-mark auto'
 rm -f "$DST/etc/resolv.conf"
 cp -f /etc/resolv.conf "$DST/etc/resolv.conf"
 add_file /etc/apt/
-run sed -i "s,%APT_SOURCE%,${APT_SOURCE:-https://mirrors.ustc.edu.cn},g" /etc/apt/sources.list
+chattr +i "$DST/etc/apt/sources.list" || true
+run sed -i "s,%APT_SOURCE%,${APT_SOURCE:-https://mirrors.ustc.edu.cn},g" /etc/apt/sources.list.d/ubuntu.sources
 run apt-get update
 run apt-get -y dist-upgrade
 
@@ -158,8 +159,8 @@ run apt-mark auto bash-completion cron wget
 run apt-get clean
 
 # Set the apt source of the resulting image to USTC mirrors
-add_file /etc/apt/sources.list
-run sed -i "s,%APT_SOURCE%,https://mirrors.ustc.edu.cn,g" /etc/apt/sources.list
+add_file /etc/apt/sources.list.d/ubuntu.sources
+run sed -i "s,%APT_SOURCE%,https://mirrors.ustc.edu.cn,g" /etc/apt/sources.list.d/ubuntu.sources
 
 # Touching hicolor cache to be very old to force it rebuild on startup
 # As /opt/vlab is inaccessible when building
@@ -175,3 +176,4 @@ rm -rf "$DST/var/lib/apt/lists"/* "$DST/var/lib/dpkg"/*-old
 rm -rf "$DST/var/cache"/*
 rm "$DST/etc/resolv.conf"
 rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
+rmdir "$DST"/*.usr-is-merged

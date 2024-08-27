@@ -1,0 +1,14 @@
+# 默认未添加源码镜像以提高 apt update 速度，如有需要可在 Types: 后面自行添加 deb-src
+# 参见 https://mirrors.ustc.edu.cn/help/ubuntu.html
+Types: deb
+URIs: %APT_SOURCE%/ubuntu/
+Suites: noble noble-updates noble-security
+Components: main restricted universe multiverse
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
+
+# For libncurses5
+Types: deb
+URIs: %APT_SOURCE%/ubuntu/
+Suites: jammy
+Components: universe
+Signed-By: /usr/share/keyrings/ubuntu-archive-keyring.gpg
