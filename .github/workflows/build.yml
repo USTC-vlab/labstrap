@@ -22,7 +22,7 @@ jobs:
       run: |
         wget --progress=dot:giga \
           -O ~/input.tar.zst \
-          http://download.proxmox.com/images/system/ubuntu-22.04-standard_22.04-1_amd64.tar.zst
+          http://download.proxmox.com/images/system/ubuntu-24.04-standard_24.04-2_amd64.tar.zst
     - name: Build it!
       run: |
         docker run --rm -i --name=labstrap --privileged \

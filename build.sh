@@ -8,6 +8,7 @@ fi
 NAME=labstrap
 ROOTFS=/opt/vlab/rootfs
 
+cd "$(dirname "$0")"
 docker build -t "$NAME" .
 docker run --rm -it --name="$NAME" --privileged \
   -v "$PWD":/srv:ro \
