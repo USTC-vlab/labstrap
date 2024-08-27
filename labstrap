@@ -71,8 +71,7 @@ run sh -c 'dpkg --get-selections | cut -f1 | xargs apt-mark auto'
 rm -f "$DST/etc/resolv.conf"
 cp -f /etc/resolv.conf "$DST/etc/resolv.conf"
 add_file /etc/apt/
-chattr +i "$DST/etc/apt/sources.list" || true
-run sed -i "s,%APT_SOURCE%,${APT_SOURCE:-https://mirrors.ustc.edu.cn},g" /etc/apt/sources.list.d/ubuntu.sources
+run sed -i "s,%APT_SOURCE%,${APT_SOURCE:=https://mirrors.ustc.edu.cn},g" /etc/apt/sources.list.d/ubuntu.sources
 run apt-get update
 run apt-get -y dist-upgrade
 
@@ -83,11 +82,20 @@ add_package \
   fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
   fonts-droid-fallback language-pack-zh-hans language-pack-gnome-zh-hans-base texmaker pluma file-roller eom atril \
   mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers light-themes \
-  caja-open-terminal libncurses5 \
+  caja-open-terminal \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh vim wget \
   ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
   firefox-vlab ssl-cert lrzsz vlab-earlyoom zenity \
   gdb build-essential
+
+# Add ncurses5 (Noble no longer packages it)
+for f in \
+  "$APT_SOURCE/ubuntu/pool/universe/n/ncurses/libtinfo5_6.4-2_amd64.deb" \
+  "$APT_SOURCE/ubuntu/pool/universe/n/ncurses/libncurses5_6.4-2_amd64.deb"
+do
+  run wget -O "/tmp/$(basename "$f")" "$f"
+  add_package "/tmp/$(basename "$f")"
+done
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
