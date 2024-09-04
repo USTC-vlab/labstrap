@@ -10,25 +10,92 @@ BASE="$(dirname "$0")"
 SRC="$BASE/rootfs"
 DST=/tmp/target
 INPUT="${1:-input.qcow2}"
+APT_SOURCE="${APT_SOURCE:-https://mirrors.ustc.edu.cn}"
 cd "$BASE"
 . ./variables
 
-qemu-img resize "$INPUT" 4096M
+run() {
+  chroot "$DST" "$@"
+}
+
+add_file() {
+  while [ "$#" -ne 0 ]; do
+    rsync -rlp "$SRC/$1" "$DST/$1"
+    shift
+  done
+}
+
+add_package() {
+  DEBIAN_FRONTEND=noninteractive run apt-get install -y --no-install-recommends "$@"
+}
+
+remove_package() {
+  DEBIAN_FRONTEND=noninteractive run apt-get purge -y --autoremove "$@"
+}
+
+mount_all() {
+  mount -t tmpfs none "$DST/dev"
+  chmod 755 "$DST/dev"
+  mknod -m0666 "$DST/dev/null" c 1 3
+  mknod -m0666 "$DST/dev/random" c 1 8
+  mknod -m0666 "$DST/dev/urandom" c 1 9
+  mknod -m0666 "$DST/dev/zero" c 1 5
+  ln -sf /proc/self/fd/0 "$DST/dev/stdin"
+  ln -sf /proc/self/fd/1 "$DST/dev/stdout"
+  ln -sf /proc/self/fd/2 "$DST/dev/stderr"
+  mkdir -p "$DST/dev/pts"
+  mount -t devpts none "$DST/dev/pts"
+  mount -t proc proc "$DST/proc"
+  mount -t tmpfs none "$DST/run"
+  mount -t sysfs sys "$DST/sys"
+  mount -t tmpfs none "$DST/tmp"
+}
+
+umount_all() {
+  umount "$DST/dev/pts"
+  umount "$DST/dev"
+  umount "$DST/proc"
+  umount "$DST/run"
+  umount "$DST/sys"
+  umount "$DST/tmp"
+  umount "$DST"
+}
+
 mkdir -p "$DST"
-guestmount -a "$INPUT" -m /dev/sda1 "$DST"
-trap 'fusermount -u "$DST"' EXIT
+if [ -b "$INPUT" ]; then
+  mount "$INPUT" "$DST"
+else
+  qemu-img resize "$INPUT" 4096M
+  guestmount -a "$INPUT" -m /dev/sda1 "$DST"
+fi
+
+mount_all
+trap umount_all EXIT
+
+# Preliminary cleanup
+rm -f "$DST/etc/resolv.conf"
+cp -f /etc/resolv.conf "$DST/etc/resolv.conf"
+add_file /etc/apt/
+run sed -i "s,%APT_SOURCE%,$APT_SOURCE,g" /etc/apt/sources.list.d/ubuntu.sources
+run apt-mark auto '~i!~M'
+run apt-get update
+run apt-get -y dist-upgrade
+
+add_package linux-virtual ubuntu-minimal ubuntu-server ubuntu-standard
 
 # Add files
-rsync -rlpt "$SRC"/etc/{apt,cloud,default,locale.gen,profile.d,skel,ssh,systemd} "$DST"/etc/
+add_file /etc/{apt,cloud,default,profile.d,skel,ssh,systemd}/ /etc/locale.gen
 
 # Remove "pass" from fstab
 sed -Ei 's/\b[0-9]+$/0/g' "$DST"/etc/fstab
 
 # Remove root password
-sed -Ei 's/^(root:)[^:]*(:.*$)/\1\2/' "$DST"/etc/shadow
+#sed -Ei 's/^(root:)[^:]*(:.*$)/\1\2/' "$DST"/etc/shadow
+run passwd -d root
 
 # Simulate systemctl enable
-ln -sfn /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
+#ln -sfn /etc/systemd/system/vlab-startup.service "$DST"/etc/systemd/system/multi-user.target.wants/vlab-startup.service
+run systemctl enable vlab-startup.service
 
 # Write version info
 VLAB_VERSION="$VERSION:$(date +%y%m%d)"
@@ -39,3 +106,17 @@ FILE="$DST"/etc/vlab_version
 echo "VLAB_DISTRO=ubuntu" > "$FILE"
 echo "VLAB_VERSION=$VLAB_VERSION" >> "$FILE"
 chmod 444 "$FILE"
+
+# Set the apt source of the resulting image to USTC mirrors
+add_file /etc/apt/sources.list.d/ubuntu.sources
+run sed -i "s,%APT_SOURCE%,https://mirrors.ustc.edu.cn,g" /etc/apt/sources.list.d/ubuntu.sources
+run apt clean
+
+# Final cleanup
+set +e
+rm -rf "$DST/var/lib/apt/lists"/* "$DST/var/lib/dpkg"/*-old
+rm -rf "$DST/var/cache"/*
+rm -f "$DST/etc/resolv.conf"
+ln -sfn ../run/systemd/resolve/stub-resolv.conf "$DST/etc/resolv.conf"
+rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
+rmdir "$DST"/*.usr-is-merged || true

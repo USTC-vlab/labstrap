@@ -1,0 +1,45 @@
+name: KVM Image Build CI
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      filename: build-${{ github.run_number }}
+      APT_SOURCE: http://azure.archive.ubuntu.com
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt update
+        sudo apt -y install qemu-utils
+        sudo modprobe nbd
+    - uses: actions/checkout@v4
+    - name: Get base image
+      run: |
+        wget --progress=dot:giga \
+          -O ~/input.qcow2 \
+          https://cloud-images.ubuntu.com/noble/current/noble-server-cloudimg-amd64.img
+    - name: Mount image
+      run: |
+        qemu-img resize ~/input.qcow2 4096M
+        sudo qemu-nbd -c /dev/nbd0 ~/input.qcow2
+    - name: Build it!
+      run: |
+        sudo ./kvmstrap /dev/nbd0p1
+    - name: Pack it!
+      run: |
+        sudo qemu-nbd -d /dev/nbd0
+        qemu-img convert -c -m 2 -O qcow2 -p ~/input.qcow2 ${{ env.filename }}.qcow2
+        ./infostrap ${{ env.filename }}.qcow2 > ${{ env.filename }}-buildinfo.txt
+    - name: Upload it!
+      uses: softprops/action-gh-release@v1
+      with:
+        tag_name: auto-build
+        files: |
+          ${{ env.filename }}.qcow2
+          ${{ env.filename }}-buildinfo.txt

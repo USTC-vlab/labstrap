@@ -6,6 +6,7 @@ BASE="$(dirname "$0")"
 SRC="$BASE/rootfs"
 DST=/target
 INPUT=/input.tar.zst
+APT_SOURCE=${APT_SOURCE:-https://mirrors.ustc.edu.cn}
 cd "$BASE"
 . ./variables
 
@@ -66,12 +67,12 @@ mount_all
 trap umount_all EXIT
 
 # Preliminary cleanup
-run sh -c 'dpkg --get-selections | cut -f1 | xargs apt-mark auto'
+run apt-mark auto '~i!~M'
 
 rm -f "$DST/etc/resolv.conf"
 cp -f /etc/resolv.conf "$DST/etc/resolv.conf"
 add_file /etc/apt/
-run sed -i "s,%APT_SOURCE%,${APT_SOURCE:=https://mirrors.ustc.edu.cn},g" /etc/apt/sources.list.d/ubuntu.sources
+run sed -i "s,%APT_SOURCE%,$APT_SOURCE,g" /etc/apt/sources.list.d/ubuntu.sources
 run apt-get update
 run apt-get -y dist-upgrade
 
@@ -184,4 +185,4 @@ rm -rf "$DST/var/lib/apt/lists"/* "$DST/var/lib/dpkg"/*-old
 rm -rf "$DST/var/cache"/*
 rm "$DST/etc/resolv.conf"
 rm -rf "$DST/etc/ssh"/ssh_host_*_key{,.pub}
-rmdir "$DST"/*.usr-is-merged
+rmdir "$DST"/*.usr-is-merged || true
