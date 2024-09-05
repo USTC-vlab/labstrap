@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       filename: build-${{ github.run_number }}
-      APT_SOURCE: http://azure.archive.ubuntu.com
     steps:
     - name: Install dependencies
       run: |
@@ -31,11 +30,13 @@ jobs:
         sudo fdisk /dev/nbd0 <<< w
     - name: Build it!
       run: |
-        sudo ./kvmstrap /dev/nbd0p1
+        sudo --preserve-env=APT_SOURCE ./kvmstrap /dev/nbd0p1
+      env:
+        APT_SOURCE: http://azure.archive.ubuntu.com
     - name: Pack it!
       run: |
         sudo qemu-nbd -d /dev/nbd0
-        qemu-img convert -c -m 2 -O qcow2 -p ~/input.qcow2 ${{ env.filename }}.qcow2
+        qemu-img convert -m 2 -O qcow2 -p ~/input.qcow2 ${{ env.filename }}.qcow2
         ./infostrap ${{ env.filename }}.qcow2 > ${{ env.filename }}-buildinfo.txt
     - name: Upload it!
       uses: softprops/action-gh-release@v1
