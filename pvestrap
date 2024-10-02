@@ -107,17 +107,18 @@ if [ ! -f "$F.dpkg-divert" ]; then
   dpkg-divert --rename --divert "$F.dpkg-divert" --add "$F"
 fi
 
-if ! grep -qP '^\s*issue_discards\s*=\s*1' "$F"; then
-  cat > "$F" << EOF
+cat > "$F" << EOF
 devices {
   # added by pve-manager to avoid scanning ZFS zvols
   global_filter=["r|/dev/zd.*|","r|/dev/rbd.*|"]
   scan_lvs=0
   issue_discards = 1
 }
+activation {
+  auto_activation_volume_list = [ "pve", "data" ]
+}
 EOF
-  update-initramfs -u -k all
-fi
+update-initramfs -u -k all
 
 
 # iptables
