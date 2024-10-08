@@ -84,7 +84,7 @@ run apt-get -y dist-upgrade
 add_package linux-virtual ubuntu-minimal ubuntu-server ubuntu-standard
 
 # Add files
-add_file /etc/{apt,cloud,default,profile.d,skel,ssh,systemd}/ /etc/locale.gen
+add_file /etc/{apt,cloud,default,profile.d,skel,ssh,sysctl.d,systemd}/ /etc/locale.gen
 
 # Remove "pass" from fstab
 sed -Ei 's/\b[0-9]+$/0/g' "$DST"/etc/fstab
