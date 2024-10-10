@@ -133,3 +133,11 @@ cat << EOF | tee /etc/iptables/rules.v{4,6} >/dev/null
 COMMIT
 EOF
 
+# Force iSCSI zeroing to not using unmap with udev rules
+# See:
+# - https://vlab.ibugone.com/records/2024-10-02/
+# - https://bugzilla.proxmox.com/show_bug.cgi?id=5754
+
+cat << EOF | tee /etc/udev/rules.d/99-scsi-zeroing-mode.rules >/dev/null
+ACTION=="add", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/scsi_disk/*", ATTR{zeroing_mode}="writesame"
+EOF
