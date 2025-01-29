@@ -90,9 +90,10 @@ add_package \
   gdb build-essential
 
 # Add ncurses5 (Noble no longer packages it)
+NCURSES_VERSION="6.3-2ubuntu0.1"
 for f in \
-  "$APT_SOURCE/ubuntu/pool/universe/n/ncurses/libtinfo5_6.4-2_amd64.deb" \
-  "$APT_SOURCE/ubuntu/pool/universe/n/ncurses/libncurses5_6.4-2_amd64.deb"
+  "$APT_SOURCE/ubuntu/pool/universe/n/ncurses/libtinfo5_${NCURSES_VERSION}_amd64.deb" \
+  "$APT_SOURCE/ubuntu/pool/universe/n/ncurses/libncurses5_${NCURSES_VERSION}_amd64.deb"
 do
   run wget -O "/tmp/$(basename "$f")" "$f"
   add_package "/tmp/$(basename "$f")"
