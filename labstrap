@@ -102,7 +102,7 @@ done
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
 run dpkg-reconfigure --frontend noninteractive tzdata
-add_file /etc/locale.gen /etc/default/locale
+add_file /etc/locale.gen /etc/default/locale /etc/locale.conf
 rm -rf "$DST/var/lib/locales/supported.d"
 run locale-gen
 
