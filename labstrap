@@ -80,7 +80,7 @@ run apt-get -y dist-upgrade
 add_package \
   fcitx-module-cloudpinyin fcitx-pinyin fcitx-sunpinyin \
   fcitx-table-wubi fcitx-ui-qimpanel fcitx-config-gtk \
-  fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 \
+  fcitx-frontend-all fcitx-frontend-gtk2 fcitx-frontend-gtk3 fcitx-frontend-qt5 fcitx-module-x11 \
   fonts-droid-fallback language-pack-zh-hans language-pack-gnome-zh-hans-base texmaker pluma file-roller eom atril \
   mate-tweak ubuntu-mate-core ubuntu-minimal vlab-vnc xserver-xorg slick-greeter ubuntu-mate-wallpapers light-themes \
   caja-open-terminal \
