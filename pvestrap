@@ -16,10 +16,25 @@ echo "root:100000:165536" > /etc/subgid
 
 
 # apt and dpkg
-cat > /etc/apt/sources.list << EOF
-deb https://mirrors.ustc.edu.cn/debian bookworm main contrib non-free non-free-firmware
-deb https://mirrors.ustc.edu.cn/debian bookworm-updates main contrib non-free non-free-firmware
-deb https://mirrors.ustc.edu.cn/debian-security bookworm-security main contrib non-free non-free-firmware
+rm -f /etc/apt/sources.list /etc/apt/sources.list.bak
+cat > /etc/apt/sources.list.d/debian.sources << EOF
+Types: deb
+URIs: https://mirrors.ustc.edu.cn/debian/
+Suites: trixie
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: https://mirrors.ustc.edu.cn/debian/
+Suites: trixie-updates
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+Types: deb
+URIs: https://mirrors.ustc.edu.cn/debian-security/
+Suites: trixie-security
+Components: main contrib non-free non-free-firmware
+Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
 EOF
 
 cat > /etc/apt/apt.conf.d/51unattended-upgrades-custom << EOF
@@ -35,9 +50,23 @@ if [ ! -f /etc/apt/keyrings/influxdata.asc ]; then
   mkdir -p /etc/apt/keyrings
   wget https://mirrors.ustc.edu.cn/influxdata/influxdata-archive_compat.key -O /etc/apt/keyrings/influxdata.asc
 fi
-echo 'deb [signed-by=/etc/apt/keyrings/influxdata.asc] https://mirrors.ustc.edu.cn/influxdata/debian stable main' > /etc/apt/sources.list.d/influxdata.list
 # remove old influxdata list, if exists
-rm -f /etc/apt/sources.list.d/influxdb.list
+rm -f /etc/apt/sources.list.d/influxdb.list /etc/apt/sources.list.d/influxdata.list
+cat > /etc/apt/sources.list.d/influxdata.sources << EOF
+Types: deb
+URIs: https://mirrors.ustc.edu.cn/influxdata/debian/
+Suites: stable
+Components: main
+Signed-By: /etc/apt/keyrings/influxdata.asc
+EOF
+
+
+# chrony
+cat > /etc/chrony/sources.d/vlab.conf << EOF
+# VLab NTP servers
+server time.ustc.edu.cn iburst
+EOF
+chronyc reload sources
 
 
 # sysctl
