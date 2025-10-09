@@ -15,6 +15,11 @@ echo "root:100000:165536" > /etc/subuid
 echo "root:100000:165536" > /etc/subgid
 
 
+# SSH known_hosts
+touch /etc/pve/priv/known_hosts
+ln -sfn /etc/pve/priv/known_hosts /root/.ssh/known_hosts
+
+
 # apt and dpkg
 rm -f /etc/apt/sources.list /etc/apt/sources.list.bak
 cat > /etc/apt/sources.list.d/debian.sources << EOF
