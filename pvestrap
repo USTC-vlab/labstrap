@@ -65,6 +65,8 @@ Components: main
 Signed-By: /etc/apt/keyrings/influxdata.asc
 EOF
 
+# Remove enterprise repo if exists
+rm -f /etc/apt/sources.list.d/pve-enterprise.sources
 
 # chrony
 cat > /etc/chrony/sources.d/vlab.conf << EOF
