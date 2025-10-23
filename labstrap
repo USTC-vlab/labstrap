@@ -87,7 +87,7 @@ add_package \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh vim wget \
   ayatana-indicator-application ayatana-indicator-session ayatana-indicator-datetime ayatana-indicator-notifications \
   firefox-vlab ssl-cert lrzsz vlab-earlyoom zenity \
-  gdb build-essential
+  gdb build-essential ncdu
 
 # Add ncurses5 (Noble no longer packages it)
 NCURSES_VERSION="6.3-2ubuntu0.1"
