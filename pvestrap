@@ -176,10 +176,10 @@ EOF
 
 if [[ $(hostname) =~ ^pv[1-9][0-9]+$ ]]; then
   cat << EOF | tee /etc/udev/rules.d/99-scsi-zeroing-mode.rules >/dev/null
-ACTION=="add", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/scsi_disk/*", ATTR{zeroing_mode}="write"
+ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="zeroing_mode", ATTR{zeroing_mode}:="write"
 EOF
 else
   cat << EOF | tee /etc/udev/rules.d/99-scsi-zeroing-mode.rules >/dev/null
-ACTION=="add", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/scsi_disk/*", ATTR{zeroing_mode}="writesame"
+ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="zeroing_mode", ATTR{zeroing_mode}:="writesame"
 EOF
 fi
