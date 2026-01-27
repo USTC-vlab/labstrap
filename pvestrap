@@ -53,7 +53,7 @@ EOF
 # influxdata source (for telegraf)
 if [ ! -f /etc/apt/keyrings/influxdata.asc ]; then
   mkdir -p /etc/apt/keyrings
-  wget https://mirrors.ustc.edu.cn/influxdata/influxdata-archive_compat.key -O /etc/apt/keyrings/influxdata.asc
+  wget https://repos.influxdata.com/influxdata-archive.key -O /etc/apt/keyrings/influxdata.asc
 fi
 # remove old influxdata list, if exists
 rm -f /etc/apt/sources.list.d/influxdb.list /etc/apt/sources.list.d/influxdata.list
