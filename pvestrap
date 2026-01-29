@@ -177,9 +177,14 @@ EOF
 if [[ $(hostname) =~ ^pv[1-9][0-9]+$ ]]; then
   cat << EOF | tee /etc/udev/rules.d/99-scsi-zeroing-mode.rules >/dev/null
 ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="zeroing_mode", ATTR{zeroing_mode}:="write"
+ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="max_write_same_blocks", ATTR{max_write_same_blocks}:="0"
 EOF
 else
   cat << EOF | tee /etc/udev/rules.d/99-scsi-zeroing-mode.rules >/dev/null
 ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="zeroing_mode", ATTR{zeroing_mode}:="writesame"
 EOF
 fi
+
+# Update sysfs attributes
+udevadm control --reload-rules
+udevadm trigger --subsystem-match=scsi_disk --action=change
