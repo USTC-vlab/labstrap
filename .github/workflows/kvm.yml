@@ -36,7 +36,7 @@ jobs:
     - name: Pack it!
       run: |
         sudo qemu-nbd -d /dev/nbd0
-        qemu-img convert -m 2 -O qcow2 -p ~/input.qcow2 ${{ env.filename }}.qcow2
+        qemu-img convert -c -m 2 -O qcow2 -p ~/input.qcow2 ${{ env.filename }}.qcow2
         ./infostrap ${{ env.filename }}.qcow2 > ${{ env.filename }}-buildinfo.txt
     - name: Upload it!
       uses: softprops/action-gh-release@v1
