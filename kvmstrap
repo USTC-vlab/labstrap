@@ -56,7 +56,8 @@ umount_all() {
   umount "$DST/dev"
   umount "$DST/proc"
   umount "$DST/run"
-  umount "$DST/sys"
+  # also umount efivar mounted
+  umount -R "$DST/sys"
   umount "$DST/tmp"
   umount "$DST"
 }
