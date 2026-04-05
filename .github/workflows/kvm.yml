@@ -10,7 +10,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      filename: build-${{ github.run_number }}
+      filename: build-kvm-${{ github.run_number }}
     steps:
     - name: Install dependencies
       run: |
