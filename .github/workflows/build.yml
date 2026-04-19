@@ -12,7 +12,7 @@ jobs:
     env:
       filename: build-${{ github.run_number }}
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Build the Docker image
       run: |
         docker build \
@@ -37,7 +37,7 @@ jobs:
         sudo tar caf ${{ env.filename }}.tar.zst -C $HOME/rootfs $TAR_FLAGS .
         ./infostrap ${{ env.filename }}.tar.zst > ${{ env.filename }}-buildinfo.txt
     - name: Upload it!
-      uses: softprops/action-gh-release@v1
+      uses: softprops/action-gh-release@v3
       with:
         tag_name: auto-build
         files: |
