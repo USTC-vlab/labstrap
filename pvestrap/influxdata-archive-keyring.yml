@@ -1,0 +1,29 @@
+---
+- name: Install package from remote .deb
+  hosts: all
+
+  tasks:
+    - name: Install influxdata-archive-keyring
+      apt:
+        deb: "https://mirrors.ustc.edu.cn/influxdata/debian/packages/influxdata-archive-keyring_2026.01.09_all.deb"
+
+    - name: InfluxData DEB822 sources file
+      copy:
+        dest: /etc/apt/sources.list.d/influxdata.sources
+        content: |
+          Types: deb
+          URIs: https://mirrors.ustc.edu.cn/influxdata/debian/
+          Suites: stable
+          Components: main
+          Signed-By: /usr/share/keyrings/influxdata-archive.gpg
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Clean up downloaded file (optional)
+      file:
+        path:
+          - /etc/apt/keyrings/influxdata.asc
+          - /etc/apt/sources.list.d/influxdata.list
+          - /etc/apt/sources.list.d/influxdata.list.bak
+        state: absent

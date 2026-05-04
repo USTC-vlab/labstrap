@@ -1,0 +1,22 @@
+- name: Collect ps output from all hosts
+  hosts: all
+  gather_facts: false
+
+  tasks:
+    - name: Run ps aux
+      command: ps aux
+      register: ps_output
+
+    - name: Ensure local ps directory exists
+      delegate_to: localhost
+      run_once: true
+      file:
+        path: "../psall"
+        state: directory
+        mode: "0755"
+
+    - name: Save output to local file
+      delegate_to: localhost
+      copy:
+        content: "{{ ps_output.stdout }}"
+        dest: "../psall/{{ inventory_hostname }}.txt"

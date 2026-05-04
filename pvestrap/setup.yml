@@ -1,0 +1,146 @@
+---
+- name: Configure Proxmox VE
+  hosts: all
+  vars:
+    dpkg_diversions:
+      - path: /etc/lvm/lvm.conf
+        divert_to: /etc/lvm/lvm.conf.dpkg-divert
+
+  tasks:
+    - name: userns for LXC
+      copy:
+        dest: "{{ item }}"
+        content: "root:100000:165536"
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - /etc/subuid
+        - /etc/subgid
+
+    - name: Ensure known_hosts exists
+      file:
+        path: /etc/pve/priv/known_hosts
+        state: touch
+        force: true
+    - name: Link ~/.ssh/known_hosts
+      file:
+        src: /etc/pve/priv/known_hosts
+        dest: /root/.ssh/known_hosts
+        state: link
+        force: true
+
+    - name: Chrony
+      register: chrony_result
+      copy:
+        dest: /etc/chrony/sources.d/vlab.conf
+        content: |
+          # Vlab NTP servers
+          server time.ustc.edu.cn iburst
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Reload chrony
+      when: chrony_result.changed
+      command: "chronyc reload sources"
+
+    - name: sysctl
+      copy:
+        dest: /etc/sysctl.d/10-vlab.conf
+        content: |
+          # ARP
+          net.ipv4.conf.all.arp_ignore = 1
+          net.ipv4.conf.all.arp_announce = 2
+
+          # inotify (for VSCode and various)
+          fs.inotify.max_user_instances = 65536
+
+          # keyctl (for Docker)
+          kernel.keys.maxkeys = 50000
+          kernel.keys.maxbytes = 1000000
+
+          # conntrack
+          net.nf_conntrack_max = 1048576
+
+          # PIDs
+          kernel.pid_max = 4194304
+
+          # Miscellaneous networking
+          net.core.default_qdisc = fq
+          net.ipv4.tcp_congestion_control = bbr
+          net.ipv4.ip_forward = 1
+          net.ipv4.neigh.default.gc_thresh3 = 8192
+          net.ipv6.neigh.default.gc_thresh3 = 8192
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: LXC config
+      copy:
+        dest: /etc/chrony/sources.d/vlab.conf
+        content: |
+          lxc.cgroup2.pids.max = {{ lxc_pids_max }}
+          lxc.prlimit.memlock = 16777216
+
+          # TUN device and KVM device
+          lxc.cgroup2.devices.allow = c 10:200 rwm
+          lxc.cgroup2.devices.allow = c 10:232 rwm
+
+          # Limit tmpfs size
+          lxc.mount.entry = tmpfs run tmpfs size=2G,mode=0755 0 0
+          lxc.mount.entry = tmpfs dev/shm tmpfs size=4G,mode=1777,create=dir 0 0
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Check dpkg diversions
+      command: dpkg-divert --list {{ item.path }}
+      register: dpkg_divert_check
+      failed_when: false
+      changed_when: false
+      loop: "{{ dpkg_diversions }}"
+    - name: Add dpkg diversions if not present
+      command: >
+        dpkg-divert --add --rename
+          --divert {{ item.item.divert_to }}
+          {{ item.item.path }}
+      when: item.stdout == ""
+      loop: "{{ dpkg_divert_check.results }}"
+
+    - name: iptables-save
+      copy:
+        dest: "{{ item }}"
+        content: |
+          *nat
+          :PREROUTING ACCEPT [0:0]
+          :INPUT ACCEPT [0:0]
+          :OUTPUT ACCEPT [0:0]
+          :POSTROUTING ACCEPT [0:0]
+          -A PREROUTING -m addrtype --dst-type LOCAL -p tcp --dport 443 -j REDIRECT --to-ports 8006
+          COMMIT
+        owner: root
+        group: root
+        mode: '0644'
+      loop:
+        - /etc/iptables/rules.v4
+        - /etc/iptables/rules.v6
+
+    - name: Fix iSCSI target quirks
+      register: iscsi_udev_result
+      copy:
+        dest: /etc/udev/rules.d/99-scsi-zeroing-mode.rules
+        content: |
+          {%- if 'gen1' in group_names -%}
+          ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="zeroing_mode", ATTR{zeroing_mode}:="writesame"
+          {%- elif 'gen2' in group_names -%}
+          ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="zeroing_mode", ATTR{zeroing_mode}:="write"
+          ACTION=="add|change", SUBSYSTEM=="scsi_disk", DEVPATH=="/devices/platform/host*/session*/target*/*/scsi_disk/*", TEST=="max_write_same_blocks", ATTR{max_write_same_blocks}:="0"
+          {%- endif %}
+        owner: root
+        group: root
+        mode: '0644'
+    - name: Call udev
+      shell: |
+        udevadm control --reload-rules
+        udevadm trigger --subsystem-match=scsi_disk --action=change
+      when: iscsi_udev_result.changed
