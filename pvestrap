@@ -62,7 +62,7 @@ Types: deb
 URIs: https://mirrors.ustc.edu.cn/influxdata/debian/
 Suites: stable
 Components: main
-Signed-By: /etc/apt/keyrings/influxdata.asc
+Signed-By: /usr/share/keyrings/influxdata-archive.gpg
 EOF
 
 # Remove enterprise repo if exists
@@ -188,7 +188,3 @@ fi
 # Update sysfs attributes
 udevadm control --reload-rules
 udevadm trigger --subsystem-match=scsi_disk --action=change
-
-# Downgrade and hold version for
-# https://bugzilla.proxmox.com/show_bug.cgi?id=7271
-apt-mark unhold pve-container && apt install -y --allow-downgrades pve-container=6.0.18 && apt-mark hold pve-container
