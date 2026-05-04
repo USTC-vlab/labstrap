@@ -1,0 +1,130 @@
+---
+- name: APT packages
+  hosts: all
+
+  vars:
+    suite: trixie
+
+  tasks:
+    - name: Remove sources.list
+      file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - /etc/apt/sources.list
+        - /etc/apt/sources.list.d/pbs-enterprise.list
+        - /etc/apt/sources.list.d/pbs-enterprise.sources
+        - /etc/apt/sources.list.d/pve.list
+        - /etc/apt/sources.list.d/pve.list.bak
+        - /etc/apt/sources.list.d/pve-enterprise.list
+        - /etc/apt/sources.list.d/pve-enterprise.sources
+    - name: Ensure DEB822 sources file (Debian)
+      copy:
+        dest: /etc/apt/sources.list.d/debian.sources
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          Types: deb
+          URIs: https://mirrors.ustc.edu.cn/debian/
+          Suites: {{ suite }}
+          Components: main contrib non-free non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          Types: deb
+          URIs: https://mirrors.ustc.edu.cn/debian/
+          Suites: {{ suite }}-updates
+          Components: main contrib non-free non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+
+          Types: deb
+          URIs: https://mirrors.ustc.edu.cn/debian-security/
+          Suites: {{ suite }}-security
+          Components: main contrib non-free non-free-firmware
+          Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
+    - name: Ensure DEB822 sources file (PVE)
+      copy:
+        dest: /etc/apt/sources.list.d/pve.sources
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          Types: deb
+          URIs: https://mirrors.ustc.edu.cn/proxmox/debian/pve/
+          Suites: {{ suite }}
+          Components: pve-no-subscription
+          Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+
+          Types: deb
+          URIs: https://mirrors.ustc.edu.cn/proxmox/debian/pbs/
+          Suites: {{ suite }}
+          Components: pbs-no-subscription
+          Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
+    - name: Ensure APT settings
+      copy:
+        dest: /etc/apt/apt.conf.d/51unattended-upgrades-custom
+        content: |
+          Unattended-Upgrade::Origins-Pattern {
+              "origin=Debian,codename=\${distro_codename}-updates,label=Debian";
+              "origin=Proxmox,codename=\${distro_codename}";
+              "origin=InfluxDB";
+          };
+
+    - name: Upgrade all packages
+      apt:
+        upgrade: dist
+        update_cache: yes
+    - name: Install PBS
+      when: inventory_hostname == "pv1"
+      apt:
+        state: present
+        name:
+          - proxmox-backup
+    - name: Install grub-efi
+      when: inventory_hostname != "pv6"
+      apt:
+        state: present
+        name:
+          - grub-efi
+    - name: Install packages
+      apt:
+        state: present
+        name:
+          - apt-listbugs
+          - apt-listchanges
+          - bmon
+          - bpfcc-tools
+          - bpftrace
+          - btrfs-progs
+          - bwm-ng
+          - duperemove
+          - fd-find
+          - htop
+          - intel-microcode
+          - iotop-c
+          - ipmitool
+          - iptables-persistent
+          - iputils-ping
+          - jq
+          - linux-sysctl-defaults
+          - lldpd
+          - ncdu
+          - net-tools
+          - netcat-openbsd
+          - proxmox-ve
+          - pv
+          - rasdaemon
+          - ripgrep
+          - rsyslog
+          - ssh
+          - strace
+          - tcpdump
+          - testdisk
+          - unattended-upgrades
+          - vim
+          - virtiofsd
+          - wget
+    - name: Auto-remove unused packages
+      apt:
+        autoremove: yes
+        purge: true
