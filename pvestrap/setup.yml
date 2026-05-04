@@ -79,7 +79,7 @@
       copy:
         dest: /etc/chrony/sources.d/vlab.conf
         content: |
-          lxc.cgroup2.pids.max = {{ lxc_pids_max }}
+          lxc.cgroup2.pids.max = 32768
           lxc.prlimit.memlock = 16777216
 
           # TUN device and KVM device

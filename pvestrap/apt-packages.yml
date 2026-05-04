@@ -94,13 +94,14 @@
           - apt-listchanges
           - bmon
           - bpfcc-tools
+          - bpftrace
           - btrfs-progs
           - bwm-ng
           - duperemove
           - fd-find
           - htop
           - intel-microcode
-          - iotop
+          - iotop-c
           - ipmitool
           - iptables-persistent
           - iputils-ping
@@ -112,6 +113,7 @@
           - netcat-openbsd
           - proxmox-ve
           - pv
+          - rasdaemon
           - ripgrep
           - rsyslog
           - ssh

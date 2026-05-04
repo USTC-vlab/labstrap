@@ -3,7 +3,6 @@ all:
     gen1:
       hosts:
         pv1:
-          lxc_pids_max: 8192
         pv2:
         pv3:
         pv4:
@@ -21,5 +20,3 @@ all:
         pv14:
         pvg1:
         pvg2:
-  vars:
-    lxc_pids_max: 32768
