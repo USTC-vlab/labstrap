@@ -7,6 +7,14 @@
         divert_to: /etc/lvm/lvm.conf.dpkg-divert
 
   tasks:
+    - name: SSH access with CA
+      copy:
+        src: vlab_ca.pub
+        dest: /etc/ssh/ssh_user_ca
+        owner: root
+        group: root
+        mode: '0644'
+
     - name: userns for LXC
       copy:
         dest: "{{ item }}"
