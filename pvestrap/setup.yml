@@ -152,3 +152,10 @@
         udevadm control --reload-rules
         udevadm trigger --subsystem-match=scsi_disk --action=change
       when: iscsi_udev_result.changed
+
+    - name: Remove AF_ALG blacklist
+      file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - /etc/modprobe.d/disable-algif.conf
