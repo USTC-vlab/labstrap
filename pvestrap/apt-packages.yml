@@ -118,6 +118,7 @@
           - rsyslog
           - ssh
           - strace
+          - sysstat
           - tcpdump
           - testdisk
           - unattended-upgrades
