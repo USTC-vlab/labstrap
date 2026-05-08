@@ -159,13 +159,15 @@
         path: "{{ item }}"
       loop:
         - /etc/modprobe.d/disable-algif.conf
-    
+
     - name: Add dirtyfrag blacklist
       copy:
         dest: /etc/modprobe.d/dirtyfrag.conf
         content: |
           install esp4 /bin/false
           install esp6 /bin/false
+          install ipcomp4 /bin/false
+          install ipcomp6 /bin/false
           install rxrpc /bin/false
         owner: root
         group: root
@@ -175,4 +177,6 @@
       shell: |
         rmmod esp4 || true
         rmmod esp6 || true
+        rmmod ipcomp4 || true
+        rmmod ipcomp6 || true
         rmmod rxrpc || true

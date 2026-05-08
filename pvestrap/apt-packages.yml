@@ -79,9 +79,16 @@
       apt:
         state: present
         name:
+          - apt-listbugs
+          - proxmox-backup
+    - name: Remove apt-listbugs
+      when: inventory_hostname != "pv1"
+      apt:
+        state: absent
+        name:
+          - apt-listbugs
           - proxmox-backup
     - name: Install grub-efi
-      when: inventory_hostname != "pv6"
       apt:
         state: present
         name:
@@ -90,7 +97,6 @@
       apt:
         state: present
         name:
-          - apt-listbugs
           - apt-listchanges
           - bmon
           - bpfcc-tools
