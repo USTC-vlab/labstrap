@@ -115,6 +115,23 @@
       when: item.stdout == ""
       loop: "{{ dpkg_divert_check.results }}"
 
+    - name: Install lvm.conf
+      copy:
+        dest: /etc/lvm/lvm.conf
+        content: |
+          devices {
+            # added by pve-manager to avoid scanning ZFS zvols
+            global_filter=["r|/dev/zd.*|","r|/dev/rbd.*|"]
+            scan_lvs=0
+            issue_discards = 1
+          }
+          activation {
+            auto_activation_volume_list = [ "pve", "data"{% if inventory_hostname == 'pv1' %}, "vlab-data"{% endif %} ]
+          }
+        owner: root
+        group: root
+        mode: '0644'
+
     - name: iptables-save
       copy:
         dest: "{{ item }}"
