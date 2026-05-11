@@ -1,6 +1,7 @@
 ---
 - name: Install package from remote .deb
   hosts: all
+  become: true
 
   tasks:
     - name: Install influxdata-archive-keyring
@@ -22,8 +23,10 @@
 
     - name: Clean up downloaded file (optional)
       file:
-        path:
-          - /etc/apt/keyrings/influxdata.asc
-          - /etc/apt/sources.list.d/influxdata.list
-          - /etc/apt/sources.list.d/influxdata.list.bak
+        path: "{{ item }}"
         state: absent
+      loop:
+        - /etc/apt/keyrings/influxdata.asc
+        - /etc/apt/sources.list.d/influxdata.list
+        - /etc/apt/sources.list.d/influxdata.list.bak
+        - /etc/apt/sources.list.d/influxdata.list.ucf-dist
