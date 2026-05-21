@@ -197,3 +197,18 @@
         rmmod ipcomp4 || true
         rmmod ipcomp6 || true
         rmmod rxrpc || true
+    
+    - name: Add PinTheft blacklist
+      copy:
+        dest: /etc/modprobe.d/pintheft.conf
+        content: |
+          install rds /bin/false
+          install rds_tcp /bin/false
+        owner: root
+        group: root
+        mode: '0644'
+    
+    - name: Unload PinTheft modules
+      shell: |
+        rmmod rds_tcp || true
+        rmmod rds || true
