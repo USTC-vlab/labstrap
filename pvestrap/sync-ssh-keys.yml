@@ -1,0 +1,41 @@
+---
+- name: Sync SSH keys from pv1 to the rest of hosts
+  hosts: all
+  gather_facts: false
+
+  vars:
+    source_host: pv1
+
+    files:
+      - src: /root/.ssh/id_rsa
+        dest: /root/.ssh/id_rsa
+        mode: "0600"
+      - src: /root/.ssh/id_rsa.pub
+        dest: /root/.ssh/id_rsa.pub
+        mode: "0644"
+      - src: /root/.ssh/id_rsa-cert.pub
+        dest: /root/.ssh/id_rsa-cert.pub
+        mode: "0644"
+
+  tasks:
+    - name: Read files from the source host
+      ansible.builtin.slurp:
+        src: "{{ item.src }}"
+      loop: "{{ files }}"
+      loop_control:
+        label: "{{ item.src }}"
+      delegate_to: "{{ source_host }}"
+      run_once: true
+      register: slurped_files
+      no_log: true
+
+    - name: Copy files to all hosts except the source
+      ansible.builtin.copy:
+        dest: "{{ item.item.dest }}"
+        content: "{{ item.content | b64decode }}"
+        mode: "{{ item.item.mode }}"
+      loop: "{{ slurped_files.results }}"
+      loop_control:
+        label: "{{ item.item.dest }}"
+      when: inventory_hostname != source_host
+      no_log: true
