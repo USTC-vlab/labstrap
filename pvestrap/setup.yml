@@ -15,8 +15,8 @@
         group: root
         mode: '0644'
 
-    - name: userns for LXC
-      copy:
+    - name: Userns for LXC
+      ansible.builtin.copy:
         dest: "{{ item }}"
         content: "root:100000:165536"
         owner: root
@@ -27,12 +27,13 @@
         - /etc/subgid
 
     - name: Ensure known_hosts exists
-      file:
+      ansible.builtin.file:
         path: /etc/pve/priv/known_hosts
         state: touch
         force: true
+
     - name: Link ~/.ssh/known_hosts
-      file:
+      ansible.builtin.file:
         src: /etc/pve/priv/known_hosts
         dest: /root/.ssh/known_hosts
         state: link
@@ -40,7 +41,7 @@
 
     - name: Chrony
       register: chrony_result
-      copy:
+      ansible.builtin.copy:
         dest: /etc/chrony/sources.d/vlab.conf
         content: |
           # Vlab NTP servers
@@ -50,8 +51,8 @@
         mode: '0644'
       notify: Reload chrony
 
-    - name: sysctl
-      copy:
+    - name: Sysctl
+      ansible.builtin.copy:
         dest: /etc/sysctl.d/10-vlab.conf
         content: |
           # ARP
@@ -118,13 +119,13 @@
       notify: Reload ssh.service
 
     - name: Check dpkg diversions
-      command: dpkg-divert --list {{ item.path }}
+      ansible.builtin.command: dpkg-divert --list {{ item.path }}
       register: dpkg_divert_check
       failed_when: false
       changed_when: false
       loop: "{{ dpkg_diversions }}"
     - name: Add dpkg diversions if not present
-      command: >
+      ansible.builtin.command: >
         dpkg-divert --add --rename
           --divert {{ item.item.divert_to }}
           {{ item.item.path }}
@@ -132,7 +133,7 @@
       loop: "{{ dpkg_divert_check.results }}"
 
     - name: Install lvm.conf
-      copy:
+      ansible.builtin.copy:
         dest: /etc/lvm/lvm.conf
         content: |
           devices {
@@ -148,8 +149,8 @@
         group: root
         mode: '0644'
 
-    - name: iptables-save
-      copy:
+    - name: Save iptables
+      ansible.builtin.copy:
         dest: "{{ item }}"
         content: |
           *nat
@@ -168,7 +169,7 @@
 
     - name: Fix iSCSI target quirks
       register: iscsi_udev_result
-      copy:
+      ansible.builtin.copy:
         dest: /etc/udev/rules.d/99-scsi-zeroing-mode.rules
         content: |
           {%- if 'gen1' in group_names -%}
@@ -181,20 +182,20 @@
         group: root
         mode: '0644'
     - name: Call udev
-      shell: |
+      ansible.builtin.shell: |
         udevadm control --reload-rules
         udevadm trigger --subsystem-match=scsi_disk --action=change
       when: iscsi_udev_result.changed
 
     - name: Remove AF_ALG blacklist
-      file:
+      ansible.builtin.file:
         state: absent
         path: "{{ item }}"
       loop:
         - /etc/modprobe.d/disable-algif.conf
 
     - name: Add dirtyfrag blacklist
-      copy:
+      ansible.builtin.copy:
         dest: /etc/modprobe.d/dirtyfrag.conf
         content: |
           install esp4 /bin/false
@@ -207,7 +208,7 @@
         mode: '0644'
 
     - name: Unload dirtyfrag modules
-      shell: |
+      ansible.builtin.shell: |
         rmmod esp4 || true
         rmmod esp6 || true
         rmmod ipcomp4 || true
@@ -215,7 +216,7 @@
         rmmod rxrpc || true
 
     - name: Add PinTheft blacklist
-      copy:
+      ansible.builtin.copy:
         dest: /etc/modprobe.d/pintheft.conf
         content: |
           install rds /bin/false
@@ -225,7 +226,7 @@
         mode: '0644'
 
     - name: Unload PinTheft modules
-      shell: |
+      ansible.builtin.shell: |
         rmmod rds_tcp || true
         rmmod rds || true
 
