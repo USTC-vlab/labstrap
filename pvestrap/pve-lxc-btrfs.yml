@@ -4,5 +4,5 @@
 
   tasks:
     - name: Install pve-lxc-btrfs
-      apt:
-        deb: https://vlab.ustc.edu.cn/repo/pve-lxc-btrfs_1.0-1_all.deb
+      ansible.builtin.apt:
+        deb: https://vlab.ustc.edu.cn/repo/pve-lxc-btrfs_1.1-3_all.deb
