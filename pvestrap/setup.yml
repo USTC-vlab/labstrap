@@ -8,7 +8,7 @@
 
   tasks:
     - name: SSH access with CA
-      copy:
+      ansible.builtin.copy:
         src: vlab_ca.pub
         dest: /etc/ssh/ssh_user_ca
         owner: root
@@ -48,9 +48,7 @@
         owner: root
         group: root
         mode: '0644'
-    - name: Reload chrony
-      when: chrony_result.changed
-      command: "chronyc reload sources"
+      notify: Reload chrony
 
     - name: sysctl
       copy:
@@ -84,8 +82,8 @@
         mode: '0644'
 
     - name: LXC config
-      copy:
-        dest: /etc/chrony/sources.d/vlab.conf
+      ansible.builtin.copy:
+        dest: /usr/share/lxc/config/common.conf.d/10-vlab.conf
         content: |
           lxc.cgroup2.pids.max = 32768
           lxc.prlimit.memlock = 16777216
@@ -236,3 +234,7 @@
       ansible.builtin.systemd:
         name: ssh.service
         state: reloaded
+
+    - name: Reload chrony
+      ansible.builtin.command: "chronyc reload sources"
+      changed_when: false
