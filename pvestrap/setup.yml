@@ -101,6 +101,24 @@
         group: root
         mode: '0644'
 
+    - name: SSHD config
+      ansible.builtin.copy:
+        dest: /etc/ssh/sshd_config.d/vlab.conf
+        content: |
+          HostKey /etc/ssh/ssh_host_ed25519_key
+          # RSA key is required for pvesh
+          HostKey /etc/ssh/ssh_host_rsa_key
+          HostCertificate /etc/ssh/ssh_host_ed25519_key-cert.pub
+          TrustedUserCAKeys /etc/ssh/ssh_user_ca
+
+          PermitRootLogin prohibit-password
+          PasswordAuthentication no
+          AuthorizedKeysFile none
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Reload ssh.service
+
     - name: Check dpkg diversions
       command: dpkg-divert --list {{ item.path }}
       register: dpkg_divert_check
@@ -197,7 +215,7 @@
         rmmod ipcomp4 || true
         rmmod ipcomp6 || true
         rmmod rxrpc || true
-    
+
     - name: Add PinTheft blacklist
       copy:
         dest: /etc/modprobe.d/pintheft.conf
@@ -207,8 +225,14 @@
         owner: root
         group: root
         mode: '0644'
-    
+
     - name: Unload PinTheft modules
       shell: |
         rmmod rds_tcp || true
         rmmod rds || true
+
+  handlers:
+    - name: Reload ssh.service
+      ansible.builtin.systemd:
+        name: ssh.service
+        state: reloaded
