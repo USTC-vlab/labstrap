@@ -22,7 +22,7 @@ jobs:
       run: |
         wget --progress=dot:giga \
           -O ~/input.tar.zst \
-          https://mirrors.ustc.edu.cn/proxmox/images/system/debian-12-standard_12.2-1_amd64.tar.zst
+          https://mirrors.ustc.edu.cn/proxmox/images/system/debian-13-standard_13.1-2_amd64.tar.zst
     - name: Build it!
       run: |
         docker run --rm -i --name=labstrap --privileged \
@@ -39,8 +39,8 @@ jobs:
     - name: Upload it!
       uses: softprops/action-gh-release@v1
       with:
-        tag_name: auto-build-debian12
-        target_commitish: debian12
+        tag_name: auto-build-debian13
+        target_commitish: debian13
         files: |
           ${{ env.filename }}.tar.zst
           ${{ env.filename }}-sha256.txt

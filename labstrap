@@ -71,7 +71,7 @@ run sh -c 'dpkg --get-selections | cut -f1 | xargs apt-mark auto'
 rm -f "$DST/etc/resolv.conf"
 cp -f /etc/resolv.conf "$DST/etc/resolv.conf"
 add_file /etc/apt/
-run sed -i "s,%APT_SOURCE%,${APT_SOURCE:-https://mirrors.ustc.edu.cn},g" /etc/apt/sources.list
+run sed -i "s,%APT_SOURCE%,$APT_SOURCE,g" /etc/apt/sources.list.d/debian.sources
 run apt-get update
 run apt-get -y dist-upgrade
 
@@ -138,8 +138,8 @@ run apt-mark auto bash-completion cron wget
 run apt-get clean
 
 # Set the apt source of the resulting image to USTC mirrors
-add_file /etc/apt/sources.list
-run sed -i "s,%APT_SOURCE%,https://mirrors.ustc.edu.cn,g" /etc/apt/sources.list
+add_file /etc/apt/sources.list.d/debian.sources
+run sed -i "s,%APT_SOURCE%,$APT_SOURCE,g" /etc/apt/sources.list.d/debian.sources
 
 # Fix ping capabilities
 setcap cap_net_raw=ep "$DST/usr/bin/ping"
