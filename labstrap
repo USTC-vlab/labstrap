@@ -80,7 +80,7 @@ add_package \
   bash-completion command-not-found cron curl dnsutils htop manpages-dev net-tools ssh usrmerge vim wget \
   iproute2 less libc-l10n locales logrotate lsof man-db nano netcat-traditional tasksel traceroute \
   ssl-cert lrzsz vlab-earlyoom iputils-ping ifupdown \
-  gdb build-essential
+  gdb build-essential sudo
 
 # Regional settings (time & language)
 ln -sf /usr/share/zoneinfo/Asia/Shanghai "$DST/etc/localtime"
