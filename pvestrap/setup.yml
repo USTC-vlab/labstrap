@@ -169,6 +169,7 @@
 
     - name: Fix iSCSI target quirks
       register: iscsi_udev_result
+      when: inventory_hostname != "pv0"
       ansible.builtin.copy:
         dest: /etc/udev/rules.d/99-scsi-zeroing-mode.rules
         content: |

@@ -81,13 +81,14 @@
         name:
           - apt-listbugs
           - proxmox-backup
-    - name: Remove apt-listbugs
+    - name: Remove unused packages
       when: inventory_hostname != "pv1"
       apt:
         state: absent
         name:
           - apt-listbugs
           - proxmox-backup
+          - systemd-timesyncd
     - name: Install grub-efi
       apt:
         state: present
@@ -103,6 +104,7 @@
           - bpftrace
           - btrfs-progs
           - bwm-ng
+          - chrony
           - duperemove
           - fd-find
           - htop
