@@ -7,7 +7,7 @@
 
   tasks:
     - name: Remove sources.list
-      file:
+      ansible.builtin.file:
         state: absent
         path: "{{ item }}"
       loop:
@@ -19,7 +19,7 @@
         - /etc/apt/sources.list.d/pve-enterprise.list
         - /etc/apt/sources.list.d/pve-enterprise.sources
     - name: Ensure DEB822 sources file (Debian)
-      copy:
+      ansible.builtin.copy:
         dest: /etc/apt/sources.list.d/debian.sources
         owner: root
         group: root
@@ -43,7 +43,7 @@
           Components: main contrib non-free non-free-firmware
           Signed-By: /usr/share/keyrings/debian-archive-keyring.gpg
     - name: Ensure DEB822 sources file (PVE)
-      copy:
+      ansible.builtin.copy:
         dest: /etc/apt/sources.list.d/pve.sources
         owner: root
         group: root
@@ -61,7 +61,7 @@
           Components: pbs-no-subscription
           Signed-By: /usr/share/keyrings/proxmox-archive-keyring.gpg
     - name: Ensure APT settings
-      copy:
+      ansible.builtin.copy:
         dest: /etc/apt/apt.conf.d/51unattended-upgrades-custom
         content: |
           Unattended-Upgrade::Origins-Pattern {
@@ -69,33 +69,36 @@
               "origin=Proxmox,codename=\${distro_codename}";
               "origin=InfluxDB";
           };
+        mode: "0644"
 
     - name: Upgrade all packages
-      apt:
+      ansible.builtin.apt:
         upgrade: dist
-        update_cache: yes
+        update_cache: true
     - name: Install PBS
       when: inventory_hostname == "pv1"
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
           - apt-listbugs
           - proxmox-backup
     - name: Remove unused packages
       when: inventory_hostname != "pv1"
-      apt:
+      ansible.builtin.apt:
         state: absent
         name:
           - apt-listbugs
           - proxmox-backup
           - systemd-timesyncd
     - name: Install grub-efi
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
           - grub-efi
+    - name: Install Vlab custom PVE packages
+      ansible.builtin.import_tasks: tasks/pve-custom-packages.yml
     - name: Install packages
-      apt:
+      ansible.builtin.apt:
         state: present
         name:
           - apt-listchanges
@@ -134,6 +137,6 @@
           - virtiofsd
           - wget
     - name: Auto-remove unused packages
-      apt:
-        autoremove: yes
+      ansible.builtin.apt:
+        autoremove: true
         purge: true

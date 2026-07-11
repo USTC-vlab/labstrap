@@ -1,8 +1,0 @@
----
-- name: Install pve-lxc-btrfs
-  hosts: all
-
-  tasks:
-    - name: Install pve-lxc-btrfs
-      ansible.builtin.apt:
-        deb: https://vlab.ustc.edu.cn/repo/pve-lxc-btrfs_1.1-3_all.deb

@@ -1,0 +1,21 @@
+---
+- name: Download pve-container
+  ansible.builtin.get_url:
+    url: "https://github.com/USTC-vlab/pve-container/releases/download/6.1.11%2Bvlab1/pve-container_6.1.11+vlab1_all.deb"
+    dest: "/tmp/pve-container.deb"
+    mode: "0644"
+
+- name: Install pve-container
+  ansible.builtin.apt:
+    deb: "/tmp/pve-container.deb"
+
+- name: Remove old hack
+  ansible.builtin.apt:
+    name:
+      - pve-lxc-btrfs
+    state: absent
+
+- name: Cleanup
+  ansible.builtin.file:
+    path: "/tmp/pve-container.deb"
+    state: absent
