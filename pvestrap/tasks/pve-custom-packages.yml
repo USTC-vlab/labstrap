@@ -1,13 +1,27 @@
 ---
-- name: Download pve-container
+- name: Download pve-container on control node
   ansible.builtin.get_url:
     url: "https://github.com/USTC-vlab/pve-container/releases/download/6.1.11%2Bvlab1/pve-container_6.1.11+vlab1_all.deb"
+    dest: "/tmp/pve-container.deb"
+    mode: "0644"
+    checksum: "sha256:5bacd84a214674328ac806023631c0cacaf35f2635b5568e1de738ece41893ef"
+  delegate_to: localhost
+  run_once: true
+
+- name: Copy deb to remote
+  ansible.builtin.copy:
+    src: "/tmp/pve-container.deb"
     dest: "/tmp/pve-container.deb"
     mode: "0644"
 
 - name: Install pve-container
   ansible.builtin.apt:
     deb: "/tmp/pve-container.deb"
+
+- name: Hold pve-container
+  ansible.builtin.dpkg_selections:
+    name: pve-container
+    selection: hold
 
 - name: Remove old hack
   ansible.builtin.apt:
