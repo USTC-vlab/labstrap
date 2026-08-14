@@ -70,7 +70,8 @@
               "origin=InfluxDB";
           };
         mode: "0644"
-
+    - name: Configure influxdata repo
+      ansible.builtin.import_tasks: tasks/influxdata-archive-keyring.yml
     - name: Upgrade all packages
       ansible.builtin.apt:
         upgrade: dist

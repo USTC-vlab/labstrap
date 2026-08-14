@@ -1,0 +1,27 @@
+---
+- name: Install influxdata-archive-keyring
+  ansible.builtin.apt:
+    deb: "https://mirrors.ustc.edu.cn/influxdata/debian/packages/influxdata-archive-keyring_2026.01.09_all.deb"
+
+- name: InfluxData DEB822 sources file
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list.d/influxdata.sources
+    content: |
+      Types: deb
+      URIs: https://mirrors.ustc.edu.cn/influxdata/debian/
+      Suites: stable
+      Components: main
+      Signed-By: /usr/share/keyrings/influxdata-archive.gpg
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Clean up downloaded file (optional)
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: absent
+  loop:
+    - /etc/apt/keyrings/influxdata.asc
+    - /etc/apt/sources.list.d/influxdata.list
+    - /etc/apt/sources.list.d/influxdata.list.bak
+    - /etc/apt/sources.list.d/influxdata.list.ucf-dist
