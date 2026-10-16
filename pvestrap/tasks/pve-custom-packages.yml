@@ -1,10 +1,10 @@
 ---
 - name: Download pve-container on control node
   ansible.builtin.get_url:
-    url: "https://github.com/USTC-vlab/pve-container/releases/download/6.1.13%2Bvlab1/pve-container_6.1.13+vlab1_all.deb"
+    url: "https://github.com/USTC-vlab/pve-container/releases/download/6.1.14%2Bvlab1/pve-container_6.1.14+vlab1_all.deb"
     dest: "/tmp/pve-container.deb"
     mode: "0644"
-    checksum: "sha256:eee6d6fe5aef604047f85c884222fe62cde78bf90b4c1e6bbb6090ef743058a5"
+    checksum: "sha256:394062d6723e75db7e2ee79f3c9314a289b9fc5eb3e279dabf12258a7b69df3f"
   delegate_to: localhost
   run_once: true
 
