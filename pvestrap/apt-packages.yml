@@ -72,6 +72,8 @@
         mode: "0644"
     - name: Configure influxdata repo
       ansible.builtin.import_tasks: tasks/influxdata-archive-keyring.yml
+    - name: Install Vlab custom PVE packages
+      ansible.builtin.import_tasks: tasks/pve-custom-packages.yml
     - name: Upgrade all packages
       ansible.builtin.apt:
         upgrade: dist
@@ -96,8 +98,6 @@
         state: present
         name:
           - grub-efi
-    - name: Install Vlab custom PVE packages
-      ansible.builtin.import_tasks: tasks/pve-custom-packages.yml
     - name: Install packages
       ansible.builtin.apt:
         state: present
